@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.esri.geoevent.parent</groupId>
+		<artifactId>azure</artifactId>
+		<version>10.4.0</version>
+	</parent>
+	<groupId>com.esri.geoevent.transport</groupId>
+	<artifactId>azure-iot-hub-transport</artifactId>
+	<name>Esri :: GeoEvent :: Transport :: Azure IoT</name>
+	<packaging>bundle</packaging>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.microsoft.azure.iothub.service.sdk</groupId>
+			<artifactId>iothub-service-sdk</artifactId>
+			<version>1.0.0-preview.4</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.qpid</groupId>
+			<artifactId>qpid-amqp-1-0-client-jms</artifactId>
+			<version>0.32</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.geronimo.specs</groupId>
+			<artifactId>geronimo-jms_1.1_spec</artifactId>
+			<version>1.1.1</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.3</version><!--$NO-MVN-MAN-VER$ -->
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<version>3.0.0</version><!--$NO-MVN-MAN-VER$ -->
+				<extensions>true</extensions>
+				<configuration>
+					<instructions>
+						<Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
+						<Bundle-ContactAddress>${contact.address}</Bundle-ContactAddress>
+						<Bundle-Version>${project.version}</Bundle-Version>
+						<Import-Package>
+							com.esri.ges.*,
+							*;resolution:=optional
+						</Import-Package>
+						<Private-Package>
+							com.esri.geoevent.transport.azure
+						</Private-Package>
+						<Export-Package />
+						<Embed-Dependency>
+							*;scope=compile|runtime;inline=true
+						</Embed-Dependency>
+						<Embed-Transitive>true</Embed-Transitive>
+					</instructions>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
