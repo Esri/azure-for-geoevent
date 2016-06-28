@@ -43,7 +43,7 @@ public class AzureEventHubInboundTransport extends InboundTransportBase
 {
   // logger
   private static final BundleLogger LOGGER                     = BundleLoggerFactory.getLogger(AzureEventHubInboundTransport.class);
-  private static final int          MAX_EVENT_COUNT            = 1000000;
+  private static final int          MAX_EVENT_COUNT            = 990;
 
   private String                    eventHubConnectionString   = "";
   private int                       eventHubNumberOfPartitions = 4;
