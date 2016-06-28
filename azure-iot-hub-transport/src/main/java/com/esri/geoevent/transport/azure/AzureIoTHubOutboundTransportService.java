@@ -1,5 +1,5 @@
 /*
-  Copyright 1995-2015 Esri
+  Copyright 1995-2016 Esri
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -30,14 +30,14 @@ import com.esri.ges.transport.TransportServiceBase;
 
 public class AzureIoTHubOutboundTransportService extends TransportServiceBase
 {
-	public AzureIoTHubOutboundTransportService()
-	{
-		definition = new AzureIoTHubOutboundTransportDefinition();
-	}
+  public AzureIoTHubOutboundTransportService()
+  {
+    definition = new AzureIoTHubOutboundTransportDefinition();
+  }
 
-	@Override
-	public Transport createTransport() throws ComponentException
-	{
-		return new AzureIoTHubOutboundTransport(definition);
-	}
+  @Override
+  public Transport createTransport() throws ComponentException
+  {
+    return new AzureIoTHubOutboundTransport(definition);
+  }
 }

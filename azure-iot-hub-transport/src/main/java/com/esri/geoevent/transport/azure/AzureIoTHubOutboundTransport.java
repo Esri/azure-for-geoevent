@@ -1,5 +1,5 @@
 /*
-  Copyright 1995-2015 Esri
+  Copyright 1995-2016 Esri
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -41,271 +41,269 @@ import com.microsoft.azure.eventhubs.EventHubClient;
 import com.microsoft.azure.iot.service.sdk.FeedbackReceiver;
 import com.microsoft.azure.iot.service.sdk.ServiceClient;
 
-
 public class AzureIoTHubOutboundTransport extends OutboundTransportBase implements GeoEventAwareTransport
 {
-	// logger
-	private static final BundleLogger	LOGGER									= BundleLoggerFactory.getLogger(AzureEventHubInboundTransport.class);
+  // logger
+  private static final BundleLogger LOGGER                 = BundleLoggerFactory.getLogger(AzureEventHubInboundTransport.class);
 
-	// connection properties
-	private String										iotServiceType					= "";
-	private String										connectionString				= "";
-	private String										deviceIdGedName					= "";
-	private String										deviceIdFieldName				= "";
+  // connection properties
+  private String                    iotServiceType         = "";
+  private String                    connectionString       = "";
+  private String                    deviceIdGedName        = "";
+  private String                    deviceIdFieldName      = "";
 
-	private volatile boolean					propertiesNeedUpdating	= false;
+  private volatile boolean          propertiesNeedUpdating = false;
 
-	private boolean										isEventHubType					= true;
+  private boolean                   isEventHubType         = true;
 
-	// device id client and receiver
-	private static ServiceClient			serviceClient						= null;
-	private static FeedbackReceiver		feedbackReceiver				= null;
+  // device id client and receiver
+  private static ServiceClient      serviceClient          = null;
+  private static FeedbackReceiver   feedbackReceiver       = null;
 
-	// event hub client
-	EventHubClient										ehClient								= null;
+  // event hub client
+  EventHubClient                    ehClient               = null;
 
-	public AzureIoTHubOutboundTransport(TransportDefinition definition) throws ComponentException
-	{
-		super(definition);
-	}
+  public AzureIoTHubOutboundTransport(TransportDefinition definition) throws ComponentException
+  {
+    super(definition);
+  }
 
-	@Override
-	public synchronized void start()
-	{
-		switch (getRunningState())
-		{
-			case STARTING:
-			case STARTED:
-				return;
-			default:
-		}
+  @Override
+  public synchronized void start()
+  {
+    switch (getRunningState())
+    {
+      case STARTING:
+      case STARTED:
+        return;
+      default:
+    }
 
-		setRunningState(RunningState.STARTING);
-		setup();
-	}
+    setRunningState(RunningState.STARTING);
+    setup();
+  }
 
-	public void readProperties()
-	{
-		try
-		{
-			boolean somethingChanged = false;
+  public void readProperties()
+  {
+    try
+    {
+      boolean somethingChanged = false;
 
-			if (hasProperty(AzureIoTHubOutboundTransportDefinition.IOT_SERVICE_TYPE_PROPERTY_NAME))
-			{
-				// IoT Service Type
-				String newIotServiceType = getProperty(AzureIoTHubOutboundTransportDefinition.IOT_SERVICE_TYPE_PROPERTY_NAME).getValueAsString();
-				if (!iotServiceType.equals(newIotServiceType))
-				{
-					iotServiceType = newIotServiceType;
-					somethingChanged = true;
-				}
-			}
-			// Connection String
-			if (hasProperty(AzureIoTHubOutboundTransportDefinition.CONNECTION_STRING_PROPERTY_NAME))
-			{
-				String newConnectionString = getProperty(AzureIoTHubOutboundTransportDefinition.CONNECTION_STRING_PROPERTY_NAME).getValueAsString();
-				if (!connectionString.equals(newConnectionString))
-				{
-					connectionString = newConnectionString;
-					somethingChanged = true;
-				}
-			}
-			// Device Id GED Name
-			if (hasProperty(AzureIoTHubOutboundTransportDefinition.DEVICE_ID_GED_NAME_PROPERTY_NAME))
-			{
-				String newGEDName = getProperty(AzureIoTHubOutboundTransportDefinition.DEVICE_ID_GED_NAME_PROPERTY_NAME).getValueAsString();
-				if (!deviceIdGedName.equals(newGEDName))
-				{
-					deviceIdGedName = newGEDName;
-					somethingChanged = true;
-				}
-			}
-			// Device Id Field Name
-			if (hasProperty(AzureIoTHubOutboundTransportDefinition.DEVICE_ID_FIELD_NAME_PROPERTY_NAME))
-			{
-				String newDeviceIdFieldName = getProperty(AzureIoTHubOutboundTransportDefinition.DEVICE_ID_FIELD_NAME_PROPERTY_NAME).getValueAsString();
-				if (!deviceIdFieldName.equals(newDeviceIdFieldName))
-				{
-					deviceIdFieldName = newDeviceIdFieldName;
-					somethingChanged = true;
-				}
-			}
-			propertiesNeedUpdating = somethingChanged;
-		}
-		catch (Exception ex)
-		{
-			LOGGER.error("INIT_ERROR", ex.getMessage());
-			LOGGER.info(ex.getMessage(), ex);
-			setErrorMessage(ex.getMessage());
-			setRunningState(RunningState.ERROR);
-		}
-	}
+      if (hasProperty(AzureIoTHubOutboundTransportDefinition.IOT_SERVICE_TYPE_PROPERTY_NAME))
+      {
+        // IoT Service Type
+        String newIotServiceType = getProperty(AzureIoTHubOutboundTransportDefinition.IOT_SERVICE_TYPE_PROPERTY_NAME).getValueAsString();
+        if (!iotServiceType.equals(newIotServiceType))
+        {
+          iotServiceType = newIotServiceType;
+          somethingChanged = true;
+        }
+      }
+      // Connection String
+      if (hasProperty(AzureIoTHubOutboundTransportDefinition.CONNECTION_STRING_PROPERTY_NAME))
+      {
+        String newConnectionString = getProperty(AzureIoTHubOutboundTransportDefinition.CONNECTION_STRING_PROPERTY_NAME).getValueAsString();
+        if (!connectionString.equals(newConnectionString))
+        {
+          connectionString = newConnectionString;
+          somethingChanged = true;
+        }
+      }
+      // Device Id GED Name
+      if (hasProperty(AzureIoTHubOutboundTransportDefinition.DEVICE_ID_GED_NAME_PROPERTY_NAME))
+      {
+        String newGEDName = getProperty(AzureIoTHubOutboundTransportDefinition.DEVICE_ID_GED_NAME_PROPERTY_NAME).getValueAsString();
+        if (!deviceIdGedName.equals(newGEDName))
+        {
+          deviceIdGedName = newGEDName;
+          somethingChanged = true;
+        }
+      }
+      // Device Id Field Name
+      if (hasProperty(AzureIoTHubOutboundTransportDefinition.DEVICE_ID_FIELD_NAME_PROPERTY_NAME))
+      {
+        String newDeviceIdFieldName = getProperty(AzureIoTHubOutboundTransportDefinition.DEVICE_ID_FIELD_NAME_PROPERTY_NAME).getValueAsString();
+        if (!deviceIdFieldName.equals(newDeviceIdFieldName))
+        {
+          deviceIdFieldName = newDeviceIdFieldName;
+          somethingChanged = true;
+        }
+      }
+      propertiesNeedUpdating = somethingChanged;
+    }
+    catch (Exception ex)
+    {
+      LOGGER.error("INIT_ERROR", ex.getMessage());
+      LOGGER.info(ex.getMessage(), ex);
+      setErrorMessage(ex.getMessage());
+      setRunningState(RunningState.ERROR);
+    }
+  }
 
-	public synchronized void setup()
-	{
-		String errorMessage = null;
-		RunningState runningState = RunningState.STARTED; 
-		
-		try
-		{
-			readProperties();
-			if (propertiesNeedUpdating)
-			{
-				cleanup();
-				propertiesNeedUpdating = false;
-			}
+  public synchronized void setup()
+  {
+    String errorMessage = null;
+    RunningState runningState = RunningState.STARTED;
 
-			// setup
-			isEventHubType = AzureIoTHubOutboundTransportDefinition.IOT_SERVICE_TYPE_EVENT_HUB.equals(iotServiceType);
-			if (isEventHubType)
-			{
-				// Event Hub
-				ehClient = EventHubClient.createFromConnectionStringSync(connectionString);
-				if (ehClient == null)
-				{
-					runningState = RunningState.ERROR;
-					errorMessage = LOGGER.translate("FAILED_TO_CREATE_EH_CLIENT", connectionString);
-					LOGGER.error(errorMessage);
-				}
-			}
-			else
-			{
-				// IoT Device
-				serviceClient = ServiceClient.createFromConnectionString(connectionString);
-				serviceClient.open();
+    try
+    {
+      readProperties();
+      if (propertiesNeedUpdating)
+      {
+        cleanup();
+        propertiesNeedUpdating = false;
+      }
 
-				// feedbackReceiver = serviceClient.getFeedbackReceiver(deviceId);
-				// if (feedbackReceiver == null)
-				// {
-				// // TODO: error messages
-				// throw new RuntimeException("ERROR");
-				// }
-				// feedbackReceiver.open();
-			}
+      // setup
+      isEventHubType = AzureIoTHubOutboundTransportDefinition.IOT_SERVICE_TYPE_EVENT_HUB.equals(iotServiceType);
+      if (isEventHubType)
+      {
+        // Event Hub
+        ehClient = EventHubClient.createFromConnectionStringSync(connectionString);
+        if (ehClient == null)
+        {
+          runningState = RunningState.ERROR;
+          errorMessage = LOGGER.translate("FAILED_TO_CREATE_EH_CLIENT", connectionString);
+          LOGGER.error(errorMessage);
+        }
+      }
+      else
+      {
+        // IoT Device
+        serviceClient = ServiceClient.createFromConnectionString(connectionString);
+        serviceClient.open();
 
-			setErrorMessage(errorMessage);
-			setRunningState(runningState);
-		}
-		catch (Exception ex)
-		{
-			LOGGER.error("INIT_ERROR", ex.getMessage());
-			LOGGER.info(ex.getMessage(), ex);
-			setErrorMessage(ex.getMessage());
-			setRunningState(RunningState.ERROR);
-		}
-	}
+        // feedbackReceiver = serviceClient.getFeedbackReceiver(deviceId);
+        // if (feedbackReceiver == null)
+        // {
+        // // TODO: error messages
+        // throw new RuntimeException("ERROR");
+        // }
+        // feedbackReceiver.open();
+      }
 
-	protected void cleanup()
-	{
-		// clean up the event hub client
-		if (ehClient != null)
-		{
-			try
-			{
-				ehClient.close();
-			}
-			catch (Exception error)
-			{
-				;
-			}
-		}
+      setErrorMessage(errorMessage);
+      setRunningState(runningState);
+    }
+    catch (Exception ex)
+    {
+      LOGGER.error("INIT_ERROR", ex.getMessage());
+      LOGGER.info(ex.getMessage(), ex);
+      setErrorMessage(ex.getMessage());
+      setRunningState(RunningState.ERROR);
+    }
+  }
 
-		
-		// clean up the service client
-		if (serviceClient != null)
-		{
-			try
-			{
-				serviceClient.close();
-			}
-			catch (Exception error)
-			{
-				;
-			}
-		}
+  protected void cleanup()
+  {
+    // clean up the event hub client
+    if (ehClient != null)
+    {
+      try
+      {
+        ehClient.close();
+      }
+      catch (Exception error)
+      {
+        ;
+      }
+    }
 
-		// clean up the receiver
-		if (feedbackReceiver != null)
-		{
-			try
-			{
-				feedbackReceiver.close();
-			}
-			catch (Exception error)
-			{
-				;
-			}
-		}
-	}
+    // clean up the service client
+    if (serviceClient != null)
+    {
+      try
+      {
+        serviceClient.close();
+      }
+      catch (Exception error)
+      {
+        ;
+      }
+    }
 
-	@Override
-	public void receive(ByteBuffer buffer, String channelId)
-	{
-		receive(buffer, channelId, null);
-	}
+    // clean up the receiver
+    if (feedbackReceiver != null)
+    {
+      try
+      {
+        feedbackReceiver.close();
+      }
+      catch (Exception error)
+      {
+        ;
+      }
+    }
+  }
 
-	@Override
-	public void receive(ByteBuffer buffer, String channelId, GeoEvent geoEvent)
-	{
-		if (isRunning())
-		{
-			if (geoEvent == null)
-				return;
+  @Override
+  public void receive(ByteBuffer buffer, String channelId)
+  {
+    receive(buffer, channelId, null);
+  }
 
-			try
-			{
-				if (isEventHubType)
-				{
-					// Send Event to an Event Hub
-					String message = new String(buffer.array(), StandardCharsets.UTF_8);
-					byte[] bytes = message.getBytes(StandardCharsets.UTF_8);  // "UTF_8"
-					//bytes = buffer.array();
-					EventData sendEvent = new EventData(bytes);
+  @Override
+  public void receive(ByteBuffer buffer, String channelId, GeoEvent geoEvent)
+  {
+    if (isRunning())
+    {
+      if (geoEvent == null)
+        return;
 
-					if (ehClient != null)
-					{
-						ehClient.sendSync(sendEvent);
-					}
-					else
-					{
-						LOGGER.warn("FAILED_TO_SEND_INVALID_EH_CONNECTION", connectionString);
-					}
-				}
-				else
-				{
-					// Send Event to a Device
-					Object deviceIdObj = geoEvent.getField(deviceIdFieldName);
-					String deviceId = "";
-					if (deviceIdObj != null)
-						deviceId = deviceIdObj.toString();
+      try
+      {
+        if (isEventHubType)
+        {
+          // Send Event to an Event Hub
+          String message = new String(buffer.array(), StandardCharsets.UTF_8);
+          byte[] bytes = message.getBytes(StandardCharsets.UTF_8); // "UTF_8"
+          // bytes = buffer.array();
+          EventData sendEvent = new EventData(bytes);
 
-					if (Validator.isNotBlank(deviceId))
-					{
-						String message = new String(buffer.array(), StandardCharsets.UTF_8);
-						serviceClient.sendAsync(deviceId, message);
+          if (ehClient != null)
+          {
+            ehClient.sendSync(sendEvent);
+          }
+          else
+          {
+            LOGGER.warn("FAILED_TO_SEND_INVALID_EH_CONNECTION", connectionString);
+          }
+        }
+        else
+        {
+          // Send Event to a Device
+          Object deviceIdObj = geoEvent.getField(deviceIdFieldName);
+          String deviceId = "";
+          if (deviceIdObj != null)
+            deviceId = deviceIdObj.toString();
 
-						// receive feedback from the device
-						// FeedbackBatch feedback = feedbackReceiver.receive(10000);
-						// feedback.toString();
-					}
-					else
-					{
-						LOGGER.warn("FAILED_TO_SEND_INVALID_DEVICE_ID", deviceIdFieldName);
-					}
-				}
-			}
-			catch (Exception e)
-			{
-				// streamClient.stop();
-				setErrorMessage(e.getMessage());
-				LOGGER.error(e.getMessage(), e);
-				setRunningState(RunningState.ERROR);
-			}
-		}
-		else
-		{
-			LOGGER.debug("RECEIVED_BUFFER_WHEN_STOPPED", "");
-		}
-	}
+          if (Validator.isNotBlank(deviceId))
+          {
+            String message = new String(buffer.array(), StandardCharsets.UTF_8);
+            serviceClient.sendAsync(deviceId, message);
+
+            // receive feedback from the device
+            // FeedbackBatch feedback = feedbackReceiver.receive(10000);
+            // feedback.toString();
+          }
+          else
+          {
+            LOGGER.warn("FAILED_TO_SEND_INVALID_DEVICE_ID", deviceIdFieldName);
+          }
+        }
+      }
+      catch (Exception e)
+      {
+        // streamClient.stop();
+        setErrorMessage(e.getMessage());
+        LOGGER.error(e.getMessage(), e);
+        setRunningState(RunningState.ERROR);
+      }
+    }
+    else
+    {
+      LOGGER.debug("RECEIVED_BUFFER_WHEN_STOPPED", "");
+    }
+  }
 
 }

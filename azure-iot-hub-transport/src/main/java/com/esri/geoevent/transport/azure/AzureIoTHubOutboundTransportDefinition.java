@@ -1,5 +1,5 @@
 /*
-  Copyright 1995-2015 Esri
+  Copyright 1995-2016 Esri
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -37,63 +37,63 @@ import com.esri.ges.transport.TransportType;
 
 public class AzureIoTHubOutboundTransportDefinition extends TransportDefinitionBase
 {
-	// logger
-	private static final BundleLogger	LOGGER															= BundleLoggerFactory.getLogger(AzureIoTHubOutboundTransportDefinition.class);
+  // logger
+  private static final BundleLogger LOGGER                             = BundleLoggerFactory.getLogger(AzureIoTHubOutboundTransportDefinition.class);
 
-	// property names
-	public static final String				IOT_SERVICE_TYPE_PROPERTY_NAME			= "iotServiceType";
-	public static final String				CONNECTION_STRING_PROPERTY_NAME			= "connectionString";
-	public static final String				DEVICE_ID_GED_NAME_PROPERTY_NAME		= "deviceIdGedName";
-	public static final String				DEVICE_ID_FIELD_NAME_PROPERTY_NAME	= "deviceIdFieldName";
+  // property names
+  public static final String        IOT_SERVICE_TYPE_PROPERTY_NAME     = "iotServiceType";
+  public static final String        CONNECTION_STRING_PROPERTY_NAME    = "connectionString";
+  public static final String        DEVICE_ID_GED_NAME_PROPERTY_NAME   = "deviceIdGedName";
+  public static final String        DEVICE_ID_FIELD_NAME_PROPERTY_NAME = "deviceIdFieldName";
 
-	public static final String				IOT_SERVICE_TYPE_EVENT_HUB					= "Event Hub";
-	public static final String				IOT_SERVICE_TYPE_IOT_DEVICE					= "IoT Device";
+  public static final String        IOT_SERVICE_TYPE_EVENT_HUB         = "Event Hub";
+  public static final String        IOT_SERVICE_TYPE_IOT_DEVICE        = "IoT Device";
 
-	public static final String				IOT_SERVICE_TYPE_DEFAULT_VALUE			= IOT_SERVICE_TYPE_EVENT_HUB;
+  public static final String        IOT_SERVICE_TYPE_DEFAULT_VALUE     = IOT_SERVICE_TYPE_EVENT_HUB;
 
-	public AzureIoTHubOutboundTransportDefinition()
-	{
-		super(TransportType.OUTBOUND);
-		try
-		{
-			String dependsOnNone = null;
-			List<LabeledValue> iotServiceTypesAllowedValues = new ArrayList<LabeledValue>();
-			iotServiceTypesAllowedValues.add(new LabeledValue("${com.esri.geoevent.transport.azure-iot-hub-transport.IOT_SERVICE_TYPE_EVENT_HUB_LBL}", IOT_SERVICE_TYPE_EVENT_HUB));
-			iotServiceTypesAllowedValues.add(new LabeledValue("${com.esri.geoevent.transport.azure-iot-hub-transport.IOT_SERVICE_TYPE_IOT_DEVICE_LBL}", IOT_SERVICE_TYPE_IOT_DEVICE));
-			propertyDefinitions.put(IOT_SERVICE_TYPE_PROPERTY_NAME, new PropertyDefinition(IOT_SERVICE_TYPE_PROPERTY_NAME, PropertyType.String, IOT_SERVICE_TYPE_DEFAULT_VALUE, "${com.esri.geoevent.transport.azure-iot-hub-transport.IOT_SERVICE_TYPE_LBL}", "${com.esri.geoevent.transport.azure-iot-hub-transport.IOT_SERVICE_TYPE_DESC}", dependsOnNone, true, false, iotServiceTypesAllowedValues));
+  public AzureIoTHubOutboundTransportDefinition()
+  {
+    super(TransportType.OUTBOUND);
+    try
+    {
+      String dependsOnNone = null;
+      List<LabeledValue> iotServiceTypesAllowedValues = new ArrayList<LabeledValue>();
+      iotServiceTypesAllowedValues.add(new LabeledValue("${com.esri.geoevent.transport.azure-iot-hub-transport.IOT_SERVICE_TYPE_EVENT_HUB_LBL}", IOT_SERVICE_TYPE_EVENT_HUB));
+      iotServiceTypesAllowedValues.add(new LabeledValue("${com.esri.geoevent.transport.azure-iot-hub-transport.IOT_SERVICE_TYPE_IOT_DEVICE_LBL}", IOT_SERVICE_TYPE_IOT_DEVICE));
+      propertyDefinitions.put(IOT_SERVICE_TYPE_PROPERTY_NAME, new PropertyDefinition(IOT_SERVICE_TYPE_PROPERTY_NAME, PropertyType.String, IOT_SERVICE_TYPE_DEFAULT_VALUE, "${com.esri.geoevent.transport.azure-iot-hub-transport.IOT_SERVICE_TYPE_LBL}", "${com.esri.geoevent.transport.azure-iot-hub-transport.IOT_SERVICE_TYPE_DESC}", dependsOnNone, true, false, iotServiceTypesAllowedValues));
 
-			propertyDefinitions.put(CONNECTION_STRING_PROPERTY_NAME, new PropertyDefinition(CONNECTION_STRING_PROPERTY_NAME, PropertyType.String, null, "${com.esri.geoevent.transport.azure-iot-hub-transport.CONNECTION_STR_LBL}", "${com.esri.geoevent.transport.azure-iot-hub-transport.CONNECTION_STR_DESC}", true, false));
-			propertyDefinitions.put(DEVICE_ID_GED_NAME_PROPERTY_NAME, new PropertyDefinition(DEVICE_ID_GED_NAME_PROPERTY_NAME, PropertyType.GeoEventDefinition, null, "${com.esri.geoevent.transport.azure-iot-hub-transport.DEVICE_ID_GED_NAME_LBL}", "${com.esri.geoevent.transport.azure-iot-hub-transport.DEVICE_ID_GED_NAME_DESC}", "iotServiceType=IoT Device", true, false));
-			propertyDefinitions.put(DEVICE_ID_FIELD_NAME_PROPERTY_NAME, new PropertyDefinition(DEVICE_ID_FIELD_NAME_PROPERTY_NAME, PropertyType.GeoEventDefinitionField, null, "${com.esri.geoevent.transport.azure-iot-hub-transport.DEVICE_ID_FIELD_NAME_LBL}", "${com.esri.geoevent.transport.azure-iot-hub-transport.DEVICE_ID_FIELD_NAME_DESC}", "iotServiceType=IoT Device", true, false));
-		}
-		catch (PropertyException error)
-		{
-			LOGGER.error("ERROR_LOADING_TRANSPORT_DEFINITION", error);
-			throw new RuntimeException(error);
-		}
-	}
+      propertyDefinitions.put(CONNECTION_STRING_PROPERTY_NAME, new PropertyDefinition(CONNECTION_STRING_PROPERTY_NAME, PropertyType.String, null, "${com.esri.geoevent.transport.azure-iot-hub-transport.CONNECTION_STR_LBL}", "${com.esri.geoevent.transport.azure-iot-hub-transport.CONNECTION_STR_DESC}", true, false));
+      propertyDefinitions.put(DEVICE_ID_GED_NAME_PROPERTY_NAME, new PropertyDefinition(DEVICE_ID_GED_NAME_PROPERTY_NAME, PropertyType.GeoEventDefinition, null, "${com.esri.geoevent.transport.azure-iot-hub-transport.DEVICE_ID_GED_NAME_LBL}", "${com.esri.geoevent.transport.azure-iot-hub-transport.DEVICE_ID_GED_NAME_DESC}", "iotServiceType=IoT Device", true, false));
+      propertyDefinitions.put(DEVICE_ID_FIELD_NAME_PROPERTY_NAME, new PropertyDefinition(DEVICE_ID_FIELD_NAME_PROPERTY_NAME, PropertyType.GeoEventDefinitionField, null, "${com.esri.geoevent.transport.azure-iot-hub-transport.DEVICE_ID_FIELD_NAME_LBL}", "${com.esri.geoevent.transport.azure-iot-hub-transport.DEVICE_ID_FIELD_NAME_DESC}", "iotServiceType=IoT Device", true, false));
+    }
+    catch (PropertyException error)
+    {
+      LOGGER.error("ERROR_LOADING_TRANSPORT_DEFINITION", error);
+      throw new RuntimeException(error);
+    }
+  }
 
-	@Override
-	public String getName()
-	{
-		return "AzureIoTHub";
-	}
+  @Override
+  public String getName()
+  {
+    return "AzureIoTHub";
+  }
 
-	@Override
-	public String getLabel()
-	{
-		return "${com.esri.geoevent.transport.azure-iot-hub-transport.TRANSPORT_OUT_LABEL}";
-	}
+  @Override
+  public String getLabel()
+  {
+    return "${com.esri.geoevent.transport.azure-iot-hub-transport.TRANSPORT_OUT_LABEL}";
+  }
 
-	@Override
-	public String getDomain()
-	{
-		return "com.esri.geoevent.transport.outbound";
-	}
+  @Override
+  public String getDomain()
+  {
+    return "com.esri.geoevent.transport.outbound";
+  }
 
-	@Override
-	public String getDescription()
-	{
-		return "${com.esri.geoevent.transport.azure-iot-hub-transport.TRANSPORT_OUT_DESC}";
-	}
+  @Override
+  public String getDescription()
+  {
+    return "${com.esri.geoevent.transport.azure-iot-hub-transport.TRANSPORT_OUT_DESC}";
+  }
 }
