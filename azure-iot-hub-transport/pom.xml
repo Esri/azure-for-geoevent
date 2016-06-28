@@ -1,34 +1,64 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+
 	<parent>
 		<groupId>com.esri.geoevent.parent</groupId>
 		<artifactId>azure</artifactId>
 		<version>10.4.0</version>
 	</parent>
+
 	<groupId>com.esri.geoevent.transport</groupId>
 	<artifactId>azure-iot-hub-transport</artifactId>
 	<name>Esri :: GeoEvent :: Transport :: Azure IoT</name>
 	<packaging>bundle</packaging>
 
 	<dependencies>
+
+		<!-- Azure Java Service SDK - using ServiceClient to Send Events to Devices -->
 		<dependency>
-			<groupId>com.microsoft.azure.iothub.service.sdk</groupId>
-			<artifactId>iothub-service-sdk</artifactId>
-			<version>1.0.0-preview.4</version>
+			<groupId>com.microsoft.azure.iothub-java-client</groupId>
+			<artifactId>iothub-java-service-client</artifactId>
+			<version>1.0.0-preview.9</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.qpid</groupId>
-			<artifactId>qpid-amqp-1-0-client-jms</artifactId>
-			<version>0.32</version>
+			<artifactId>proton-j</artifactId>
+			<version>0.12.0</version>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.geronimo.specs</groupId>
-			<artifactId>geronimo-jms_1.1_spec</artifactId>
-			<version>1.1.1</version>
-			<scope>provided</scope>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcpkix-jdk15on</artifactId>
+			<version>1.47</version>
 		</dependency>
+
+		<!-- Azure Java Event Hub SDK - using EventHubClient to Receive events from Event Hubs and to Send (Notification) Events to Event Hubs -->
+		<dependency>
+			<groupId>com.microsoft.azure</groupId>
+			<artifactId>azure-eventhubs</artifactId>
+			<version>0.6.4</version>
+		</dependency>
+
+		<!-- Azure Java Event Hub SDK - used to Send (Notification) Events to Event Hubs -->
+		<!--
+		<dependency>
+			<groupId>com.microsoft.azure</groupId>
+			<artifactId>azure-eventhubs-clients</artifactId>
+			<version>0.6.5</version>
+		</dependency>
+		-->
+
+		<!-- Azure Java Device SDK - another way to Send events to Devices.  used by the Simulator. -->
+		<!--
+		<dependency>
+				<groupId>com.microsoft.azure.iothub-java-client</groupId>
+				<artifactId>iothub-java-client</artifactId>
+				<version>1.0.1</version>
+				<classifier>with-deps</classifier>
+		</dependency>
+		-->
+
 	</dependencies>
 
 	<build>
@@ -36,7 +66,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.3</version><!--$NO-MVN-MAN-VER$ -->
+				<version>3.3</version><!--$NO-MVN-MAN-VER$-->
 				<configuration>
 					<source>1.8</source>
 					<target>1.8</target>
@@ -45,7 +75,7 @@
 			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
-				<version>3.0.0</version><!--$NO-MVN-MAN-VER$ -->
+				<version>3.0.0</version><!--$NO-MVN-MAN-VER$-->
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
@@ -59,7 +89,7 @@
 						<Private-Package>
 							com.esri.geoevent.transport.azure
 						</Private-Package>
-						<Export-Package />
+						<Export-Package/>
 						<Embed-Dependency>
 							*;scope=compile|runtime;inline=true
 						</Embed-Dependency>

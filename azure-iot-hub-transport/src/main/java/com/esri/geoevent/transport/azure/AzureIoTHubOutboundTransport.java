@@ -36,24 +36,33 @@ import com.esri.ges.transport.GeoEventAwareTransport;
 import com.esri.ges.transport.OutboundTransportBase;
 import com.esri.ges.transport.TransportDefinition;
 import com.esri.ges.util.Validator;
+import com.microsoft.azure.eventhubs.EventData;
+import com.microsoft.azure.eventhubs.EventHubClient;
 import com.microsoft.azure.iot.service.sdk.FeedbackReceiver;
 import com.microsoft.azure.iot.service.sdk.ServiceClient;
+
 
 public class AzureIoTHubOutboundTransport extends OutboundTransportBase implements GeoEventAwareTransport
 {
 	// logger
-	private static final BundleLogger LOGGER = BundleLoggerFactory.getLogger(AzureEventHubInboundTransport.class);
+	private static final BundleLogger	LOGGER									= BundleLoggerFactory.getLogger(AzureEventHubInboundTransport.class);
 
 	// connection properties
-	private String	connectionString	= "";
-	private String	gedName						= "";
-	private String	deviceIdFieldName	= "";
+	private String										iotServiceType					= "";
+	private String										connectionString				= "";
+	private String										deviceIdGedName					= "";
+	private String										deviceIdFieldName				= "";
 
-	private volatile boolean propertiesNeedUpdating = false;
+	private volatile boolean					propertiesNeedUpdating	= false;
 
-	// client and receiver
-	private static ServiceClient		serviceClient			= null;
-	private static FeedbackReceiver	feedbackReceiver	= null;
+	private boolean										isEventHubType					= true;
+
+	// device id client and receiver
+	private static ServiceClient			serviceClient						= null;
+	private static FeedbackReceiver		feedbackReceiver				= null;
+
+	// event hub client
+	EventHubClient										ehClient								= null;
 
 	public AzureIoTHubOutboundTransport(TransportDefinition definition) throws ComponentException
 	{
@@ -79,8 +88,19 @@ public class AzureIoTHubOutboundTransport extends OutboundTransportBase implemen
 	{
 		try
 		{
-			// get the properties from the connector properties
 			boolean somethingChanged = false;
+
+			if (hasProperty(AzureIoTHubOutboundTransportDefinition.IOT_SERVICE_TYPE_PROPERTY_NAME))
+			{
+				// IoT Service Type
+				String newIotServiceType = getProperty(AzureIoTHubOutboundTransportDefinition.IOT_SERVICE_TYPE_PROPERTY_NAME).getValueAsString();
+				if (!iotServiceType.equals(newIotServiceType))
+				{
+					iotServiceType = newIotServiceType;
+					somethingChanged = true;
+				}
+			}
+			// Connection String
 			if (hasProperty(AzureIoTHubOutboundTransportDefinition.CONNECTION_STRING_PROPERTY_NAME))
 			{
 				String newConnectionString = getProperty(AzureIoTHubOutboundTransportDefinition.CONNECTION_STRING_PROPERTY_NAME).getValueAsString();
@@ -90,15 +110,17 @@ public class AzureIoTHubOutboundTransport extends OutboundTransportBase implemen
 					somethingChanged = true;
 				}
 			}
-			if (hasProperty(AzureIoTHubOutboundTransportDefinition.GED_NAME_PROPERTY_NAME))
+			// Device Id GED Name
+			if (hasProperty(AzureIoTHubOutboundTransportDefinition.DEVICE_ID_GED_NAME_PROPERTY_NAME))
 			{
-				String newGEDName = getProperty(AzureIoTHubOutboundTransportDefinition.GED_NAME_PROPERTY_NAME).getValueAsString();
-				if (!gedName.equals(newGEDName))
+				String newGEDName = getProperty(AzureIoTHubOutboundTransportDefinition.DEVICE_ID_GED_NAME_PROPERTY_NAME).getValueAsString();
+				if (!deviceIdGedName.equals(newGEDName))
 				{
-					gedName = newGEDName;
+					deviceIdGedName = newGEDName;
 					somethingChanged = true;
 				}
 			}
+			// Device Id Field Name
 			if (hasProperty(AzureIoTHubOutboundTransportDefinition.DEVICE_ID_FIELD_NAME_PROPERTY_NAME))
 			{
 				String newDeviceIdFieldName = getProperty(AzureIoTHubOutboundTransportDefinition.DEVICE_ID_FIELD_NAME_PROPERTY_NAME).getValueAsString();
@@ -121,6 +143,9 @@ public class AzureIoTHubOutboundTransport extends OutboundTransportBase implemen
 
 	public synchronized void setup()
 	{
+		String errorMessage = null;
+		RunningState runningState = RunningState.STARTED; 
+		
 		try
 		{
 			readProperties();
@@ -131,18 +156,35 @@ public class AzureIoTHubOutboundTransport extends OutboundTransportBase implemen
 			}
 
 			// setup
-			serviceClient = ServiceClient.createFromConnectionString(connectionString);
-			serviceClient.open();
-			// feedbackReceiver = serviceClient.getFeedbackReceiver(deviceId);
-			// if (feedbackReceiver == null)
-			// {
-			// // TODO: error messages
-			// throw new RuntimeException("ERROR");
-			// }
-			// feedbackReceiver.open();
+			isEventHubType = AzureIoTHubOutboundTransportDefinition.IOT_SERVICE_TYPE_EVENT_HUB.equals(iotServiceType);
+			if (isEventHubType)
+			{
+				// Event Hub
+				ehClient = EventHubClient.createFromConnectionStringSync(connectionString);
+				if (ehClient == null)
+				{
+					runningState = RunningState.ERROR;
+					errorMessage = LOGGER.translate("FAILED_TO_CREATE_EH_CLIENT", connectionString);
+					LOGGER.error(errorMessage);
+				}
+			}
+			else
+			{
+				// IoT Device
+				serviceClient = ServiceClient.createFromConnectionString(connectionString);
+				serviceClient.open();
 
-			setErrorMessage(null);
-			setRunningState(RunningState.STARTED);
+				// feedbackReceiver = serviceClient.getFeedbackReceiver(deviceId);
+				// if (feedbackReceiver == null)
+				// {
+				// // TODO: error messages
+				// throw new RuntimeException("ERROR");
+				// }
+				// feedbackReceiver.open();
+			}
+
+			setErrorMessage(errorMessage);
+			setRunningState(runningState);
 		}
 		catch (Exception ex)
 		{
@@ -155,6 +197,20 @@ public class AzureIoTHubOutboundTransport extends OutboundTransportBase implemen
 
 	protected void cleanup()
 	{
+		// clean up the event hub client
+		if (ehClient != null)
+		{
+			try
+			{
+				ehClient.close();
+			}
+			catch (Exception error)
+			{
+				;
+			}
+		}
+
+		
 		// clean up the service client
 		if (serviceClient != null)
 		{
@@ -198,24 +254,44 @@ public class AzureIoTHubOutboundTransport extends OutboundTransportBase implemen
 
 			try
 			{
-				Object deviceIdObj = geoEvent.getField(deviceIdFieldName);
-				String deviceId = "";
-				if (deviceIdObj != null)
-					deviceId = deviceIdObj.toString();
-
-				// send the message
-				if (Validator.isNotBlank(deviceId))
+				if (isEventHubType)
 				{
+					// Send Event to an Event Hub
 					String message = new String(buffer.array(), StandardCharsets.UTF_8);
-					serviceClient.sendAsync(deviceId, message);
+					byte[] bytes = message.getBytes(StandardCharsets.UTF_8);  // "UTF_8"
+					//bytes = buffer.array();
+					EventData sendEvent = new EventData(bytes);
 
-					// receive feedback from the device
-					// FeedbackBatch feedback = feedbackReceiver.receive(10000);
-					// feedback.toString();
+					if (ehClient != null)
+					{
+						ehClient.sendSync(sendEvent);
+					}
+					else
+					{
+						LOGGER.warn("FAILED_TO_SEND_INVALID_EH_CONNECTION", connectionString);
+					}
 				}
 				else
 				{
-					LOGGER.warn("FAILED_TO_SEND_INVALID_DEVICE_ID", deviceIdFieldName);
+					// Send Event to a Device
+					Object deviceIdObj = geoEvent.getField(deviceIdFieldName);
+					String deviceId = "";
+					if (deviceIdObj != null)
+						deviceId = deviceIdObj.toString();
+
+					if (Validator.isNotBlank(deviceId))
+					{
+						String message = new String(buffer.array(), StandardCharsets.UTF_8);
+						serviceClient.sendAsync(deviceId, message);
+
+						// receive feedback from the device
+						// FeedbackBatch feedback = feedbackReceiver.receive(10000);
+						// feedback.toString();
+					}
+					else
+					{
+						LOGGER.warn("FAILED_TO_SEND_INVALID_DEVICE_ID", deviceIdFieldName);
+					}
 				}
 			}
 			catch (Exception e)
