@@ -23,9 +23,11 @@
  */
 package com.esri.geoevent.transport.azure;
 
+import java.io.IOException;
 import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
 import java.time.Instant;
+import java.util.concurrent.ExecutionException;
 
 import com.esri.ges.core.component.ComponentException;
 import com.esri.ges.core.component.RunningState;
@@ -154,26 +156,12 @@ public class AzureEventHubInboundTransport extends InboundTransportBase
       receivers = new PartitionReceiver[eventHubNumberOfPartitions];
       ehClients = new EventHubClient[eventHubNumberOfPartitions];
 
-      for (int i = 0; i < eventHubNumberOfPartitions; i++)
+      for (int partitionId = 0; partitionId < eventHubNumberOfPartitions; partitionId++)
       {
-        EventHubClient ehClient = EventHubClient.createFromConnectionString(eventHubConnectionString).get();
-        if (ehClient != null)
-        {
-          ehClients[i] = ehClient;
-          LOGGER.debug("CREATED_EVENT_HUB_CLIENT", i);
-        }
-        PartitionReceiver receiver = ehClient.createReceiver(EventHubClient.DEFAULT_CONSUMER_GROUP_NAME, Integer.toString(i), Instant.now()).get();
-        if (receiver != null)
-        {
-          receiver.setReceiveHandler(new EventHandler(MAX_EVENT_COUNT));
-          receivers[i] = receiver;
-          LOGGER.debug("CREATED_CLIENT_RECEIVER", i);
-        }
-        else
-        {
-          throw new Exception(LOGGER.translate("UNABLE_TO_CREATE_RECEIVER", i));
-        }
+        createEventHubClient(partitionId);
+        createPartitionReceiver(partitionId);
       }
+
       LOGGER.debug("RECEVERS_CREATED");
       setRunningState(RunningState.STARTED);
     }
@@ -183,6 +171,32 @@ public class AzureEventHubInboundTransport extends InboundTransportBase
       LOGGER.error(errorMessage, error);
       setRunningState(RunningState.ERROR);
       cleanup();
+    }
+  }
+
+  private void createEventHubClient(int partitionId) throws InterruptedException, ExecutionException, ServiceBusException, IOException
+  {
+    EventHubClient ehClient = EventHubClient.createFromConnectionString(eventHubConnectionString).get();
+    if (ehClient != null)
+    {
+      ehClients[partitionId] = ehClient;
+      LOGGER.debug("CREATED_EVENT_HUB_CLIENT", partitionId);
+    }
+  }
+
+  private void createPartitionReceiver(int partitionId) throws Exception
+  {
+    EventHubClient ehClient = ehClients[partitionId];
+    PartitionReceiver receiver = ehClient.createReceiver(EventHubClient.DEFAULT_CONSUMER_GROUP_NAME, Integer.toString(partitionId), Instant.now()).get();
+    if (receiver != null)
+    {
+      receiver.setReceiveHandler(new EventHandler(MAX_EVENT_COUNT, partitionId));
+      receivers[partitionId] = receiver;
+      LOGGER.debug("CREATED_CLIENT_RECEIVER", partitionId);
+    }
+    else
+    {
+      throw new Exception(LOGGER.translate("UNABLE_TO_CREATE_RECEIVER", partitionId));
     }
   }
 
@@ -219,9 +233,12 @@ public class AzureEventHubInboundTransport extends InboundTransportBase
 
   public final class EventHandler extends PartitionReceiveHandler
   {
-    public EventHandler(final int maxEventCount)
+    private int partitionId;
+
+    public EventHandler(final int maxEventCount, final int partitionId)
     {
       super(maxEventCount);
+      this.partitionId = partitionId;
     }
 
     @Override
@@ -239,6 +256,14 @@ public class AzureEventHubInboundTransport extends InboundTransportBase
     public void onError(Throwable error)
     {
       LOGGER.warn("EVENT_HUB_RECEIVER_ERROR", error);
+      try
+      {
+        // TODO - recreate partition receiver with partitionId?
+        //createPartitionReceiver(partitionId);
+      }
+      catch (Exception ignored)
+      {
+      }
     }
   }
 
