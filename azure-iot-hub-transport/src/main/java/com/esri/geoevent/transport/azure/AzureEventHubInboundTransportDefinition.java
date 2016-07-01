@@ -31,6 +31,7 @@ import com.esri.ges.framework.i18n.BundleLogger;
 import com.esri.ges.framework.i18n.BundleLoggerFactory;
 import com.esri.ges.transport.TransportDefinitionBase;
 import com.esri.ges.transport.TransportType;
+import com.microsoft.azure.eventhubs.EventHubClient;
 
 public class AzureEventHubInboundTransportDefinition extends TransportDefinitionBase
 {
@@ -38,7 +39,10 @@ public class AzureEventHubInboundTransportDefinition extends TransportDefinition
   private static final BundleLogger LOGGER                                      = BundleLoggerFactory.getLogger(AzureEventHubInboundTransportDefinition.class);
 
   // property names
+  public static final String        EVENT_HUB_PATH_PROPERTY_NAME                = "eventHubPath";
+  public static final String        CONSUMER_GROUP_NAME_PROPERTY_NAME           = "consumerGroupName";
   public static final String        EVENT_HUB_CONNECTION_STRING_PROPERTY_NAME   = "eventHubConnectionString";
+  public static final String        STORAGE_CONNECTION_STRING_PROPERTY_NAME     = "storageConnectionString";
   public static final String        EVENT_HUB_NUMBER_OF_PARTITION_PROPERTY_NAME = "eventHubNumberOfPartitions";
 
   public AzureEventHubInboundTransportDefinition()
@@ -46,7 +50,10 @@ public class AzureEventHubInboundTransportDefinition extends TransportDefinition
     super(TransportType.INBOUND);
     try
     {
+      propertyDefinitions.put(EVENT_HUB_PATH_PROPERTY_NAME, new PropertyDefinition(EVENT_HUB_PATH_PROPERTY_NAME, PropertyType.String, null, "${com.esri.geoevent.transport.azure-iot-hub-transport.EVENT_HUB_PATH_LBL}", "${com.esri.geoevent.transport.azure-iot-hub-transport.EVENT_HUB_PATH_DESC}", true, false));
+      propertyDefinitions.put(CONSUMER_GROUP_NAME_PROPERTY_NAME, new PropertyDefinition(CONSUMER_GROUP_NAME_PROPERTY_NAME, PropertyType.String, EventHubClient.DEFAULT_CONSUMER_GROUP_NAME, "${com.esri.geoevent.transport.azure-iot-hub-transport.CONSUMER_GROUP_NAME_LBL}", "${com.esri.geoevent.transport.azure-iot-hub-transport.CONSUMER_GROUP_NAME_DESC}", true, false));
       propertyDefinitions.put(EVENT_HUB_CONNECTION_STRING_PROPERTY_NAME, new PropertyDefinition(EVENT_HUB_CONNECTION_STRING_PROPERTY_NAME, PropertyType.String, null, "${com.esri.geoevent.transport.azure-iot-hub-transport.EVENT_HUB_CONNECTION_STRING_LBL}", "${com.esri.geoevent.transport.azure-iot-hub-transport.EVENT_HUB_CONNECTION_STRING_DESC}", true, false));
+      propertyDefinitions.put(STORAGE_CONNECTION_STRING_PROPERTY_NAME, new PropertyDefinition(STORAGE_CONNECTION_STRING_PROPERTY_NAME, PropertyType.String, null, "${com.esri.geoevent.transport.azure-iot-hub-transport.STORAGE_CONNECTION_STRING_LBL}", "${com.esri.geoevent.transport.azure-iot-hub-transport.STORAGE_CONNECTION_STRING_DESC}", true, false));
       propertyDefinitions.put(EVENT_HUB_NUMBER_OF_PARTITION_PROPERTY_NAME, new PropertyDefinition(EVENT_HUB_NUMBER_OF_PARTITION_PROPERTY_NAME, PropertyType.Integer, 4, "${com.esri.geoevent.transport.azure-iot-hub-transport.NUMBER_OF_PARTITIONS_LBL}", "${com.esri.geoevent.transport.azure-iot-hub-transport.NUMBER_OF_PARTITIONS_DESC}", true, false));
     }
     catch (PropertyException error)

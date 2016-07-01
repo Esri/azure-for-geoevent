@@ -18,6 +18,11 @@
     <!-- Azure Java Event Hub SDK - using EventHubClient to Receive events from Event Hubs and to Send (Notification) Events to Event Hubs -->
     <dependency>
       <groupId>com.microsoft.azure</groupId>
+      <artifactId>azure-eventhubs-eph</artifactId>
+      <version>0.7.2</version>
+    </dependency>
+    <dependency>
+      <groupId>com.microsoft.azure</groupId>
       <artifactId>azure-eventhubs</artifactId>
       <version>0.7.2</version>
     </dependency>
