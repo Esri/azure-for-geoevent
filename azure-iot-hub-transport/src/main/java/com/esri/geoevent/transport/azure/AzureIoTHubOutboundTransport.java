@@ -39,6 +39,8 @@ import com.esri.ges.util.Validator;
 import com.microsoft.azure.eventhubs.EventData;
 import com.microsoft.azure.eventhubs.EventHubClient;
 import com.microsoft.azure.iot.service.sdk.FeedbackReceiver;
+import com.microsoft.azure.iot.service.sdk.IotHubServiceClientProtocol;
+import com.microsoft.azure.iot.service.sdk.Message;
 import com.microsoft.azure.iot.service.sdk.ServiceClient;
 
 public class AzureIoTHubOutboundTransport extends OutboundTransportBase implements GeoEventAwareTransport
@@ -170,7 +172,7 @@ public class AzureIoTHubOutboundTransport extends OutboundTransportBase implemen
       else
       {
         // IoT Device
-        serviceClient = ServiceClient.createFromConnectionString(connectionString);
+        serviceClient = ServiceClient.createFromConnectionString(connectionString, IotHubServiceClientProtocol.AMQPS);
         serviceClient.open();
 
         // feedbackReceiver = serviceClient.getFeedbackReceiver(deviceId);
@@ -279,7 +281,8 @@ public class AzureIoTHubOutboundTransport extends OutboundTransportBase implemen
 
           if (Validator.isNotBlank(deviceId))
           {
-            String message = new String(buffer.array(), StandardCharsets.UTF_8);
+            String messageStr = new String(buffer.array(), StandardCharsets.UTF_8);
+            Message message = new Message(messageStr);
             serviceClient.sendAsync(deviceId, message);
 
             // receive feedback from the device
