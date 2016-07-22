@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <template productVersion="10.4.0">
   <connectors>
-    <connector accessType="editable" label="Send JSON to Azure Iot Hub" name="azure-json-out" type="outbound">
+    <connector accessType="editable" label="Send JSON to Azure Event Hub or IoT Device" name="azure-json-out" type="outbound">
       <adapter uri="com.esri.ges.adapter.outbound/Generic-JSON/10.4.0"/>
       <defaultName>json-azure-out</defaultName>
-      <description>Send JSON to Azure Iot Hub</description>
+      <description>Send JSON to Azure Event Hub or IoT Device</description>
       <properties>
         <advanced>
           <property default="false" label="Formatted JSON" name="prettyJson" source="adapter"/>
@@ -19,10 +19,10 @@
       </properties>
       <transport uri="com.esri.geoevent.transport.outbound/AzureIoTHub/10.4.0"/>
     </connector>
-    <connector accessType="editable" label="Receive JSON from Azure IoT Hub" name="azure-json-in" type="inbound">
+    <connector accessType="editable" label="Receive JSON from Azure Event Hub" name="azure-json-in" type="inbound">
       <adapter uri="com.esri.ges.adapter.inbound/Generic-JSON/10.4.0"/>
       <defaultName>azure-json-in</defaultName>
-      <description>Receive JSON from Azure IoT Hub</description>
+      <description>Receive JSON from Azure Event Hub</description>
       <properties>
         <advanced>
           <property label="JSON Object Name" name="JsonObjectName" source="adapter"/>
