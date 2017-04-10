@@ -5,7 +5,7 @@
 
   <groupId>com.esri.geoevent.parent</groupId>
   <artifactId>azure</artifactId>
-  <version>10.4.0</version>
+  <version>10.5.0</version>
   <packaging>pom</packaging>
 
   <name>Esri :: GeoEvent :: Azure</name>
@@ -18,14 +18,15 @@
   </properties>
 
   <modules>
-    <module>azure-iot-hub-transport</module>
+    <module>azure-iot-event-hub-transport</module>
+    <module>azure-iot-device-transport</module>
   </modules>
 
   <dependencies>
     <dependency>
       <groupId>com.esri.geoevent.sdk</groupId>
       <artifactId>geoevent-sdk</artifactId>
-      <version>10.4.0</version>
+      <version>10.5.0</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>

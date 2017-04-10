@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+  <bean id="AzureEventHubInboundTransportServiceBean" class="com.esri.geoevent.transport.azure.AzureEventHubInboundTransportService" activation="eager">
+    <property name="bundleContext" ref="blueprintBundleContext" />
+  </bean>
+  <service id="AzureEventHubInboundTransportService" ref="AzureEventHubInboundTransportServiceBean" interface="com.esri.ges.transport.TransportService" />
+
+  <bean id="AzureEventHubOutboundTransportServiceBean" class="com.esri.geoevent.transport.azure.AzureEventHubOutboundTransportService" activation="eager">
+    <property name="bundleContext" ref="blueprintBundleContext" />
+  </bean>
+  <service id="AzureEventHubOutboundTransportService" ref="AzureEventHubOutboundTransportServiceBean" interface="com.esri.ges.transport.TransportService" />
+
+</blueprint>
