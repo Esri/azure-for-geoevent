@@ -18,8 +18,8 @@
   </properties>
 
   <modules>
-    <module>azure-iot-event-hub-transport</module>
-    <module>azure-iot-device-transport</module>
+    <module>azure-event-hub-transport</module>
+    <module>azure-device-transport</module>
   </modules>
 
   <dependencies>
