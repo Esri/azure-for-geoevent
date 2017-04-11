@@ -48,9 +48,9 @@ public class AzureEventHubInboundTransportDefinition extends TransportDefinition
     super(TransportType.INBOUND);
     try
     {
-      propertyDefinitions.put(CONSUMER_GROUP_NAME_PROPERTY_NAME, new PropertyDefinition(CONSUMER_GROUP_NAME_PROPERTY_NAME, PropertyType.String, EventHubClient.DEFAULT_CONSUMER_GROUP_NAME, "${com.esri.geoevent.transport.azure-iot-hub-transport.CONSUMER_GROUP_NAME_LBL}", "${com.esri.geoevent.transport.azure-iot-hub-transport.CONSUMER_GROUP_NAME_DESC}", true, false));
-      propertyDefinitions.put(EVENT_HUB_CONNECTION_STRING_PROPERTY_NAME, new PropertyDefinition(EVENT_HUB_CONNECTION_STRING_PROPERTY_NAME, PropertyType.String, null, "${com.esri.geoevent.transport.azure-iot-hub-transport.EVENT_HUB_CONNECTION_STRING_LBL}", "${com.esri.geoevent.transport.azure-iot-hub-transport.EVENT_HUB_CONNECTION_STRING_DESC}", true, false));
-      propertyDefinitions.put(EVENT_HUB_NUMBER_OF_PARTITION_PROPERTY_NAME, new PropertyDefinition(EVENT_HUB_NUMBER_OF_PARTITION_PROPERTY_NAME, PropertyType.Integer, 4, "${com.esri.geoevent.transport.azure-iot-hub-transport.NUMBER_OF_PARTITIONS_LBL}", "${com.esri.geoevent.transport.azure-iot-hub-transport.NUMBER_OF_PARTITIONS_DESC}", true, false));
+      propertyDefinitions.put(CONSUMER_GROUP_NAME_PROPERTY_NAME, new PropertyDefinition(CONSUMER_GROUP_NAME_PROPERTY_NAME, PropertyType.String, EventHubClient.DEFAULT_CONSUMER_GROUP_NAME, "${com.esri.geoevent.transport.azure-event-hub-transport.CONSUMER_GROUP_NAME_LBL}", "${com.esri.geoevent.transport.azure-event-hub-transport.CONSUMER_GROUP_NAME_DESC}", true, false));
+      propertyDefinitions.put(EVENT_HUB_CONNECTION_STRING_PROPERTY_NAME, new PropertyDefinition(EVENT_HUB_CONNECTION_STRING_PROPERTY_NAME, PropertyType.String, null, "${com.esri.geoevent.transport.azure-event-hub-transport.EVENT_HUB_CONNECTION_STRING_LBL}", "${com.esri.geoevent.transport.azure-event-hub-transport.EVENT_HUB_CONNECTION_STRING_DESC}", true, false));
+      propertyDefinitions.put(EVENT_HUB_NUMBER_OF_PARTITION_PROPERTY_NAME, new PropertyDefinition(EVENT_HUB_NUMBER_OF_PARTITION_PROPERTY_NAME, PropertyType.Integer, 4, "${com.esri.geoevent.transport.azure-event-hub-transport.NUMBER_OF_PARTITIONS_LBL}", "${com.esri.geoevent.transport.azure-event-hub-transport.NUMBER_OF_PARTITIONS_DESC}", true, false));
     }
     catch (PropertyException error)
     {
@@ -68,7 +68,7 @@ public class AzureEventHubInboundTransportDefinition extends TransportDefinition
   @Override
   public String getLabel()
   {
-    return "${com.esri.geoevent.transport.azure-iot-hub-transport.TRANSPORT_IN_LABEL}";
+    return "${com.esri.geoevent.transport.azure-event-hub-transport.TRANSPORT_IN_LABEL}";
   }
 
   @Override
@@ -80,6 +80,6 @@ public class AzureEventHubInboundTransportDefinition extends TransportDefinition
   @Override
   public String getDescription()
   {
-    return "${com.esri.geoevent.transport.azure-iot-hub-transport.TRANSPORT_IN_DESC}";
+    return "${com.esri.geoevent.transport.azure-event-hub-transport.TRANSPORT_IN_DESC}";
   }
 }

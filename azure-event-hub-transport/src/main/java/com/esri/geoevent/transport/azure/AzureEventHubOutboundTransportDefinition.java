@@ -44,7 +44,7 @@ public class AzureEventHubOutboundTransportDefinition extends TransportDefinitio
     super(TransportType.OUTBOUND);
     try
     {
-      propertyDefinitions.put(CONNECTION_STRING_PROPERTY_NAME, new PropertyDefinition(CONNECTION_STRING_PROPERTY_NAME, PropertyType.String, null, "${com.esri.geoevent.transport.azure-iot-hub-transport.CONNECTION_STR_LBL}", "${com.esri.geoevent.transport.azure-iot-hub-transport.CONNECTION_STR_DESC}", true, false));
+      propertyDefinitions.put(CONNECTION_STRING_PROPERTY_NAME, new PropertyDefinition(CONNECTION_STRING_PROPERTY_NAME, PropertyType.String, null, "${com.esri.geoevent.transport.azure-event-hub-transport.CONNECTION_STR_LBL}", "${com.esri.geoevent.transport.azure-event-hub-transport.CONNECTION_STR_DESC}", true, false));
     }
     catch (PropertyException error)
     {
@@ -62,7 +62,7 @@ public class AzureEventHubOutboundTransportDefinition extends TransportDefinitio
   @Override
   public String getLabel()
   {
-    return "${com.esri.geoevent.transport.azure-iot-hub-transport.TRANSPORT_OUT_LABEL}";
+    return "${com.esri.geoevent.transport.azure-event-hub-transport.TRANSPORT_OUT_LABEL}";
   }
 
   @Override
@@ -74,6 +74,6 @@ public class AzureEventHubOutboundTransportDefinition extends TransportDefinitio
   @Override
   public String getDescription()
   {
-    return "${com.esri.geoevent.transport.azure-iot-hub-transport.TRANSPORT_OUT_DESC}";
+    return "${com.esri.geoevent.transport.azure-event-hub-transport.TRANSPORT_OUT_DESC}";
   }
 }
