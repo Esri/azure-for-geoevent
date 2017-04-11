@@ -44,7 +44,6 @@ public class AzureEventHubOutboundTransport extends OutboundTransportBase implem
   private static final BundleLogger LOGGER                 = BundleLoggerFactory.getLogger(AzureEventHubInboundTransport.class);
 
   // connection properties
-  private String                    iotServiceType         = "";
   private String                    connectionString       = "";
 
   private volatile boolean          propertiesNeedUpdating = false;
@@ -78,16 +77,6 @@ public class AzureEventHubOutboundTransport extends OutboundTransportBase implem
     {
       boolean somethingChanged = false;
 
-      if (hasProperty(AzureEventHubOutboundTransportDefinition.IOT_SERVICE_TYPE_PROPERTY_NAME))
-      {
-        // IoT Service Type
-        String newIotServiceType = getProperty(AzureEventHubOutboundTransportDefinition.IOT_SERVICE_TYPE_PROPERTY_NAME).getValueAsString();
-        if (!iotServiceType.equals(newIotServiceType))
-        {
-          iotServiceType = newIotServiceType;
-          somethingChanged = true;
-        }
-      }
       // Connection String
       if (hasProperty(AzureEventHubOutboundTransportDefinition.CONNECTION_STRING_PROPERTY_NAME))
       {

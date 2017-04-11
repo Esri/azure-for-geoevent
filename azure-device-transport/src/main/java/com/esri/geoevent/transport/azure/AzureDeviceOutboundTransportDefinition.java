@@ -60,7 +60,7 @@ public class AzureDeviceOutboundTransportDefinition extends TransportDefinitionB
   @Override
   public String getName()
   {
-    return "OutboundAzureDevice";
+    return "azure-device-out";
   }
 
   @Override

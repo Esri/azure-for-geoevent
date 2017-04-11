@@ -43,20 +43,13 @@ import com.microsoft.azure.servicebus.ServiceBusException;
 
 public class AzureEventHubInboundTransport extends InboundTransportBase
 {
-  // based on the microsoft's azure-eventhubs-eph API:
-  //   https://azure.microsoft.com/en-us/documentation/articles/event-hubs-java-ephjava-getstarted/#receive-messages-with-eventprocessorhost-in-java
-  //   https://github.com/Azure/azure-event-hubs/tree/master/java/azure-eventhubs-eph
-  //   https://github.com/Azure/azure-event-hubs/tree/master/java
-
   // logger
   private static final BundleLogger LOGGER                     = BundleLoggerFactory.getLogger(AzureEventHubInboundTransport.class);
   private static final int          MAX_EVENT_COUNT            = 990;
 
   // transport properties
-  private String                    eventHubPath               = "";
   private String                    consumerGroupName          = EventHubClient.DEFAULT_CONSUMER_GROUP_NAME;
   private String                    eventHubConnectionString   = "";
-  private String                    storageConnectionString    = "";
   private int                       eventHubNumberOfPartitions = 4;
 
   // data members
@@ -148,10 +141,8 @@ public class AzureEventHubInboundTransport extends InboundTransportBase
   {
     try
     {
-      eventHubPath = getProperty(AzureEventHubInboundTransportDefinition.EVENT_HUB_PATH_PROPERTY_NAME).getValueAsString();
       consumerGroupName = getProperty(AzureEventHubInboundTransportDefinition.CONSUMER_GROUP_NAME_PROPERTY_NAME).getValueAsString();
       eventHubConnectionString = getProperty(AzureEventHubInboundTransportDefinition.EVENT_HUB_CONNECTION_STRING_PROPERTY_NAME).getValueAsString();
-      storageConnectionString = getProperty(AzureEventHubInboundTransportDefinition.STORAGE_CONNECTION_STRING_PROPERTY_NAME).getValueAsString();
       eventHubNumberOfPartitions = Integer.parseInt(getProperty(AzureEventHubInboundTransportDefinition.EVENT_HUB_NUMBER_OF_PARTITION_PROPERTY_NAME).getValueAsString());
     }
     catch (Exception e)
