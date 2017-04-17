@@ -15,11 +15,11 @@
   <packaging>bundle</packaging>
 
   <dependencies>
-    <!-- Azure Java Service SDK - using ServiceClient to Send Events to Devices -->
+    <!-- Azure Java Service Client SDK - using ServiceClient to Send Events to Devices -->
     <dependency>
-      <groupId>com.microsoft.azure.iothub-java-client</groupId>
-      <artifactId>iothub-java-service-client</artifactId>
-      <version>1.0.7</version>
+      <groupId>com.microsoft.azure.sdk.iot</groupId>
+      <artifactId>iot-service-client</artifactId>
+      <version>1.2.18</version>
     </dependency>
   </dependencies>
 

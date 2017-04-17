@@ -39,6 +39,7 @@ import com.microsoft.azure.eventhubs.EventData;
 import com.microsoft.azure.eventhubs.EventHubClient;
 import com.microsoft.azure.eventhubs.PartitionReceiveHandler;
 import com.microsoft.azure.eventhubs.PartitionReceiver;
+import com.microsoft.azure.servicebus.ConnectionStringBuilder;
 import com.microsoft.azure.servicebus.ServiceBusException;
 
 public class AzureEventHubInboundTransport extends InboundTransportBase
@@ -269,7 +270,7 @@ public class AzureEventHubInboundTransport extends InboundTransportBase
       for (EventData event : events)
       {
         // String message = new String(event.getBody(),
-        receive(event.getBody());
+        receive(event.getBytes());
       }
     }
 

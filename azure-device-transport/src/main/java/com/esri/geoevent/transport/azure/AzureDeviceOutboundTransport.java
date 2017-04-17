@@ -24,9 +24,6 @@
 
 package com.esri.geoevent.transport.azure;
 
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
-
 import com.esri.ges.core.component.ComponentException;
 import com.esri.ges.core.component.RunningState;
 import com.esri.ges.core.geoevent.GeoEvent;
@@ -36,10 +33,13 @@ import com.esri.ges.transport.GeoEventAwareTransport;
 import com.esri.ges.transport.OutboundTransportBase;
 import com.esri.ges.transport.TransportDefinition;
 import com.esri.ges.util.Validator;
-import com.microsoft.azure.iot.service.sdk.FeedbackReceiver;
-import com.microsoft.azure.iot.service.sdk.IotHubServiceClientProtocol;
-import com.microsoft.azure.iot.service.sdk.Message;
-import com.microsoft.azure.iot.service.sdk.ServiceClient;
+import com.microsoft.azure.sdk.iot.service.FeedbackReceiver;
+import com.microsoft.azure.sdk.iot.service.IotHubServiceClientProtocol;
+import com.microsoft.azure.sdk.iot.service.Message;
+import com.microsoft.azure.sdk.iot.service.ServiceClient;
+
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 
 public class AzureDeviceOutboundTransport extends OutboundTransportBase implements GeoEventAwareTransport
 {

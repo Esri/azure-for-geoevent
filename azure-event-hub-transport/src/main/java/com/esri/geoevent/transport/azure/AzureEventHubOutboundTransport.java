@@ -37,8 +37,9 @@ import com.esri.ges.transport.OutboundTransportBase;
 import com.esri.ges.transport.TransportDefinition;
 import com.microsoft.azure.eventhubs.EventData;
 import com.microsoft.azure.eventhubs.EventHubClient;
+import com.microsoft.azure.sdk.iot.device.*;
 
-public class AzureEventHubOutboundTransport extends OutboundTransportBase implements GeoEventAwareTransport
+public class AzureEventHubOutboundTransport extends OutboundTransportBase implements GeoEventAwareTransport, IotHubEventCallback
 {
   // logger
   private static final BundleLogger LOGGER                 = BundleLoggerFactory.getLogger(AzureEventHubInboundTransport.class);
@@ -50,10 +51,19 @@ public class AzureEventHubOutboundTransport extends OutboundTransportBase implem
 
   // event hub client
   EventHubClient                    ehClient               = null;
+  DeviceClient                      deviceClient           = null;
 
   public AzureEventHubOutboundTransport(TransportDefinition definition) throws ComponentException
   {
     super(definition);
+  }
+
+  @Override
+  public void execute(IotHubStatusCode status, Object context)
+  {
+    Integer i = (Integer) context;
+    System.out.println("IoT Hub responded to message " + i.toString()
+        + " with status " + status.name());
   }
 
   @Override
@@ -112,13 +122,27 @@ public class AzureEventHubOutboundTransport extends OutboundTransportBase implem
         propertiesNeedUpdating = false;
       }
 
-      // setup Event Hub
-      ehClient = EventHubClient.createFromConnectionStringSync(connectionString);
-      if (ehClient == null)
+      if (connectionString.startsWith("Endpoint="))
       {
-        runningState = RunningState.ERROR;
-        errorMessage = LOGGER.translate("FAILED_TO_CREATE_EH_CLIENT", connectionString);
-        LOGGER.error(errorMessage);
+        // setup Event Hub
+        ehClient = EventHubClient.createFromConnectionStringSync(connectionString);
+        if (ehClient == null) {
+          runningState = RunningState.ERROR;
+          errorMessage = LOGGER.translate("FAILED_TO_CREATE_EH_CLIENT", connectionString);
+          LOGGER.error(errorMessage);
+        }
+      }
+      else
+      {
+        // setup the device client
+        deviceClient = new DeviceClient(connectionString, IotHubClientProtocol.AMQPS);
+        if (deviceClient == null) {
+          runningState = RunningState.ERROR;
+          errorMessage = LOGGER.translate("FAILED_TO_CREATE_EH_CLIENT", connectionString);
+          LOGGER.error(errorMessage);
+        } else {
+          deviceClient.open();
+        }
       }
 
       setErrorMessage(errorMessage);
@@ -147,6 +171,19 @@ public class AzureEventHubOutboundTransport extends OutboundTransportBase implem
         ;
       }
     }
+
+    // clean up the device client
+    if (deviceClient != null)
+    {
+      try
+      {
+        deviceClient.close();
+      }
+      catch (Exception error)
+      {
+        ;
+      }
+    }
   }
 
   @Override
@@ -166,14 +203,21 @@ public class AzureEventHubOutboundTransport extends OutboundTransportBase implem
       try
       {
         // Send Event to an Event Hub
-        String message = new String(buffer.array(), StandardCharsets.UTF_8);
-        byte[] bytes = message.getBytes(StandardCharsets.UTF_8); // "UTF_8"
-        // bytes = buffer.array();
-        EventData sendEvent = new EventData(bytes);
+        String messageStr = new String(buffer.array(), StandardCharsets.UTF_8);
 
         if (ehClient != null)
         {
-          ehClient.sendSync(sendEvent);
+          byte[] bytes = messageStr.getBytes(StandardCharsets.UTF_8); // "UTF_8"
+          EventData eventData = new EventData(bytes);
+          ehClient.sendSync(eventData);
+        }
+        else if (deviceClient != null)
+        {
+          String callbackContext = "1";
+          Message message = new Message(messageStr);
+          message.setProperty("messageCount", callbackContext);
+          //message.setExpiryTime(5000);
+          deviceClient.sendEventAsync(message, this, callbackContext);
         }
         else
         {

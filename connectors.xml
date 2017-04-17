@@ -66,7 +66,7 @@
       </properties>
       <transport uri="com.esri.geoevent.transport.inbound/azure-event-hub-in/10.5.0"/>
     </connector>
-    <connector accessType="editable" label="Publish text to a TCP Socket (Server)" name="esri-out-text-tcp-server" type="outbound">
+    <connector accessType="editable" label="Publish text to a TCP Socket (Server)" name="esri-out-text-server-tcp-server" type="outbound">
       <adapter uri="com.esri.ges.adapter.outbound/Text/10.5.0"/>
       <defaultName>tcp-server-text-out</defaultName>
       <description>Sends GeoEvents as text to TCP Server, so they can be displayed in a client application.</description>
