@@ -22,19 +22,15 @@
   email: contracts@esri.com
  */
 
-package com.esri.geoevent.transport.azure;
+package com.esri.geoevent.transport.azure
 
-import com.esri.ges.core.component.ComponentException;
-import com.esri.ges.transport.Transport;
-import com.esri.ges.transport.TransportServiceBase;
+import com.esri.ges.transport.{Transport, TransportServiceBase}
 
-public class AzureEventHubOutboundTransportService extends TransportServiceBase {
-  public AzureEventHubOutboundTransportService() {
-    definition = new AzureEventHubOutboundTransportDefinition();
-  }
+class AzureIoTHubInboundTransportService extends TransportServiceBase {
+  //setup the definition
+  definition = new AzureIoTHubInboundTransportDefinition()
 
   @Override
-  public Transport createTransport() throws ComponentException {
-    return new AzureEventHubOutboundTransport(definition);
-  }
+  def createTransport(): Transport = new AzureIoTHubInboundTransport(definition)
+
 }

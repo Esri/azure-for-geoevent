@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<template productVersion="10.5.1">
+    <geoEventServices>
+        <geoEventService name="da1e2815-ce16-4ee3-8433-c99a3cc5268f" label="write-to-hub" description="" lineStyle="Diagonal" runningState="ERROR" statusDetails="Invalid Reference: &quot;json-azure-event-hub-out&quot; doesn't exist.&#xA;GeoEvent Service has no outputs.">
+            <inputs>
+                <input ref="d3c3eeca-270d-4da2-8584-32c42320642f" label="tcp-text-in" left="10" top="10" width="68" height="40"/>
+            </inputs>
+            <outputs>
+                <output ref="734d3462-95a4-49b7-8904-fc6ef604f71a" label="json-azure-event-hub-out" left="190" top="10" width="200" height="40"/>
+            </outputs>
+            <nodes/>
+            <flow>
+                <from ref="d3c3eeca-270d-4da2-8584-32c42320642f" label="tcp-text-in">
+                    <to ref="734d3462-95a4-49b7-8904-fc6ef604f71a" label="json-azure-event-hub-out"/>
+                </from>
+            </flow>
+            <geoEventsReceivedRateRange max="0.0" min="0.0"/>
+            <geoEventsSentRateRange max="0.0" min="0.0"/>
+        </geoEventService>
+        <geoEventService name="39e7711d-e6a3-4c5c-89e6-3ae18f4986c6" label="read-from-hub" description="" lineStyle="Diagonal" runningState="ERROR" statusDetails="Invalid Reference: &quot;azure-event-hub-json-in&quot; doesn't exist.&#xA;GeoEvent Service has no inputs.">
+            <inputs>
+                <input ref="0d87cce7-00cc-4594-8228-0742f8f444b2" label="azure-event-hub-json-in" left="10" top="10" width="200" height="40"/>
+            </inputs>
+            <outputs>
+                <output ref="e570b621-2cdf-4a6f-8889-6de1a6e02bb6" label="tcp-server-text-out" left="330" top="10" width="119" height="40"/>
+            </outputs>
+            <nodes/>
+            <flow>
+                <from ref="0d87cce7-00cc-4594-8228-0742f8f444b2" label="azure-event-hub-json-in">
+                    <to ref="e570b621-2cdf-4a6f-8889-6de1a6e02bb6" label="tcp-server-text-out"/>
+                </from>
+            </flow>
+            <geoEventsReceivedRateRange max="0.0" min="0.0"/>
+            <geoEventsSentRateRange max="0.0" min="0.0"/>
+        </geoEventService>
+    </geoEventServices>
+    <inputs>
+        <input clusterCommand="STOP" connector="azure-iot-hub-in" connectorLabel="azure-iot-hub-in" label="azure-iot-hub-in" name="474156ba-9013-4bf6-8e02-9ea9d3456190" runningState="ERROR" statusDetails="Stopping Stream 'azure-iot-hub-in' because the Transport is not available." supportsAllGeoEventDefinitions="true">
+            <adapter uri="com.esri.ges.adapter.inbound/Generic-JSON/10.5.1">
+                <properties>
+                    <property name="YGeometryField" type="String"></property>
+                    <property name="CreateGeoEventDefinition" type="Boolean">true</property>
+                    <property name="isLearningMode" type="Boolean">false</property>
+                    <property name="ExistingGeoEventDefinitionName" type="GeoEventDefinition">faa</property>
+                    <property name="ZGeometryField" type="String"></property>
+                    <property name="NewGeoEventDefinitionName" type="String">NewFeatureGeoEventDef1</property>
+                    <property name="asGeoJson" type="Boolean">false</property>
+                    <property name="WKTextGeometryField" type="String"></property>
+                    <property name="BuildGeometryFromFields" type="Boolean">false</property>
+                    <property name="CustomDateFormat" type="String"></property>
+                    <property name="WKIDGeometryField" type="String"></property>
+                    <property name="JsonObjectName" type="String"></property>
+                    <property name="XGeometryField" type="String"></property>
+                </properties>
+            </adapter>
+            <geoEventDefinitionHistory/>
+            <geoEventsRateRange max="0.0" min="0.0"/>
+            <supportedGeoEventDefinitions/>
+            <transport uri="com.esri.geoevent.transport.inbound/azure-iot-hub-in/10.5.0"/>
+        </input>
+        <input clusterCommand="STOP" connector="esri-in-tcp-text-generictext" connectorLabel="Receive Text from a TCP Socket" label="tcp-text-in" name="d3c3eeca-270d-4da2-8584-32c42320642f" runningState="STOPPED" statusDetails="NULL" supportsAllGeoEventDefinitions="true">
+            <adapter uri="com.esri.ges.adapter.inbound/Text/10.5.1">
+                <properties>
+                    <property name="CreateFixedGeoEventDefinitions" type="Boolean">true</property>
+                    <property name="YGeometryField" type="String"></property>
+                    <property name="ZGeometryField" type="String"></property>
+                    <property name="MessageSeparator" type="String">\n</property>
+                    <property name="IncomingDataContainsGeoEventDefinition" type="Boolean">true</property>
+                    <property name="CreateUnrecognizedGeoEventDefinitions" type="Boolean">true</property>
+                    <property name="WKTextGeometryField" type="String"></property>
+                    <property name="LocaleForNumberFormatter" type="String"></property>
+                    <property name="BuildGeometryFromFields" type="Boolean">false</property>
+                    <property name="CustomDateFormat" type="String"></property>
+                    <property name="NewFixedGeoEventDefinitionName" type="String"></property>
+                    <property name="WKIDGeometryField" type="String"></property>
+                    <property name="ExistingFixedGeoEventDefinitionName" type="GeoEventDefinition">faa</property>
+                    <property name="XGeometryField" type="String"></property>
+                    <property name="AttributeSeparator" type="String">,</property>
+                </properties>
+            </adapter>
+            <geoEventDefinitionHistory/>
+            <geoEventsRateRange max="0.0" min="0.0"/>
+            <supportedGeoEventDefinitions/>
+            <transport uri="com.esri.ges.transport.inbound/TCP/10.5.1">
+                <properties>
+                    <property name="mode" type="String">SERVER</property>
+                    <property name="handshake" type="String"></property>
+                    <property name="port" type="Integer">5565</property>
+                    <property name="host" type="String">localhost</property>
+                    <property name="clientConnectionTimeout" type="Integer">60</property>
+                </properties>
+            </transport>
+        </input>
+    </inputs>
+    <outputs>
+        <output clusterCommand="STOP" connector="esri-out-text-tcp-client-copy" connectorLabel="Publish text to a TCP Socket (Server)" label="tcp-server-text-out" name="e570b621-2cdf-4a6f-8889-6de1a6e02bb6" runningState="STOPPED" statusDetails="NULL" supportsAllGeoEventDefinitions="true">
+            <adapter uri="com.esri.ges.adapter.outbound/Text/10.5.1">
+                <properties>
+                    <property name="LocaleForNumberFormatter" type="String"></property>
+                    <property name="MessageSeparator" type="String">\n</property>
+                    <property name="CustomDateFormat" type="String"></property>
+                    <property name="mimeType" type="String">text/plain</property>
+                    <property name="CustomDateFormatType" type="String">ISO 8601 Format</property>
+                    <property name="AttributeSeparator" type="String">,</property>
+                </properties>
+            </adapter>
+            <geoEventDefinitionHistory/>
+            <geoEventsRateRange max="0.0" min="0.0"/>
+            <supportedGeoEventDefinitions/>
+            <transport uri="com.esri.ges.transport.outbound/TCP/10.5.1">
+                <properties>
+                    <property name="mode" type="String">SERVER</property>
+                    <property name="port" type="Integer">5575</property>
+                    <property name="host" type="String">localhost</property>
+                    <property name="clientConnectionTimeout" type="Integer">60</property>
+                </properties>
+            </transport>
+        </output>
+    </outputs>
+    <geoEventDefinitions>
+        <geoEventDefinition guid="3bf4265e-31ad-4686-b8f0-78786b6c3cdb" name="faa" owner="auto-generated/com.esri.ges.adapter.inbound.Text/10.5.1" accessType="editable">
+            <fieldDefinitions>
+                <fieldDefinition name="UID" type="Long" cardinality="One">
+                    <fieldDefinitions/>
+                </fieldDefinition>
+                <fieldDefinition name="Name" type="String" cardinality="One">
+                    <fieldDefinitionTag>
+                        <name>TRACK_ID</name>
+                    </fieldDefinitionTag>
+                    <fieldDefinitions/>
+                </fieldDefinition>
+                <fieldDefinition name="StartTime" type="Date" cardinality="One">
+                    <fieldDefinitionTag>
+                        <name>TIME_START</name>
+                    </fieldDefinitionTag>
+                    <fieldDefinitions/>
+                </fieldDefinition>
+                <fieldDefinition name="Longitude" type="Double" cardinality="One">
+                    <fieldDefinitions/>
+                </fieldDefinition>
+                <fieldDefinition name="Latitude" type="Double" cardinality="One">
+                    <fieldDefinitions/>
+                </fieldDefinition>
+                <fieldDefinition name="Heading" type="Double" cardinality="One">
+                    <fieldDefinitions/>
+                </fieldDefinition>
+                <fieldDefinition name="Capacity" type="Integer" cardinality="One">
+                    <fieldDefinitions/>
+                </fieldDefinition>
+                <fieldDefinition name="PassengerCount" type="Integer" cardinality="One">
+                    <fieldDefinitions/>
+                </fieldDefinition>
+                <fieldDefinition name="AircraftModel" type="String" cardinality="One">
+                    <fieldDefinitions/>
+                </fieldDefinition>
+                <fieldDefinition name="Origin" type="String" cardinality="One">
+                    <fieldDefinitions/>
+                </fieldDefinition>
+                <fieldDefinition name="Destination" type="String" cardinality="One">
+                    <fieldDefinitions/>
+                </fieldDefinition>
+                <fieldDefinition name="Description" type="String" cardinality="One">
+                    <fieldDefinitions/>
+                </fieldDefinition>
+                <fieldDefinition name="AircraftType" type="String" cardinality="One">
+                    <fieldDefinitions/>
+                </fieldDefinition>
+                <fieldDefinition name="Purpose" type="String" cardinality="One">
+                    <fieldDefinitions/>
+                </fieldDefinition>
+                <fieldDefinition name="Status" type="String" cardinality="One">
+                    <fieldDefinitions/>
+                </fieldDefinition>
+                <fieldDefinition name="GA" type="String" cardinality="One">
+                    <fieldDefinitions/>
+                </fieldDefinition>
+                <fieldDefinition name="Geometry" type="Geometry" cardinality="One">
+                    <fieldDefinitionTag>
+                        <name>GEOMETRY</name>
+                    </fieldDefinitionTag>
+                    <fieldDefinitions/>
+                </fieldDefinition>
+            </fieldDefinitions>
+        </geoEventDefinition>
+    </geoEventDefinitions>
+    <tags/>
+    <connectors>
+        <connector accessType="editable" label="Send JSON to Azure Event Hub" name="json-azure-event-hub-out" type="outbound">
+            <adapter uri="com.esri.ges.adapter.outbound/Generic-JSON/10.5.1"/>
+            <defaultName>json-azure-event-hub-out</defaultName>
+            <description>Send JSON to Azure Event Hub</description>
+            <properties>
+                <advanced>
+                    <property default="false" label="Formatted JSON" name="prettyJson" source="adapter"/>
+                </advanced>
+                <hidden>
+                    <property default="application/json" label="MIME Type" name="mimeType" source="adapter"/>
+                </hidden>
+                <shown>
+                    <property label="Connection String" name="connectionString" source="transport"/>
+                </shown>
+            </properties>
+            <transport uri="com.esri.geoevent.transport.outbound/azure-event-hub-out/10.5.0"/>
+        </connector>
+        <connector accessType="editable" label="Send JSON to Azure IoT Device" name="json-azure-device-out" type="outbound">
+            <adapter uri="com.esri.ges.adapter.outbound/Generic-JSON/10.5.1"/>
+            <defaultName>json-azure-device-out</defaultName>
+            <description>Send JSON to Azure IoT Device</description>
+            <properties>
+                <advanced>
+                    <property default="false" label="Formatted JSON" name="prettyJson" source="adapter"/>
+                </advanced>
+                <hidden>
+                    <property default="application/json" label="MIME Type" name="mimeType" source="adapter"/>
+                </hidden>
+                <shown>
+                    <property label="Connection String" name="connectionString" source="transport"/>
+                    <property label="Device Id GeoEvent Definition Name" name="deviceIdGedName" source="transport"/>
+                    <property label="Device Id Field Name" name="deviceIdFieldName" source="transport"/>
+                </shown>
+            </properties>
+            <transport uri="com.esri.geoevent.transport.outbound/azure-device-out/10.5.0"/>
+        </connector>
+        <connector accessType="editable" label="Publish text to a TCP Socket (Server)" name="esri-out-text-tcp-client-copy" type="outbound">
+            <adapter uri="com.esri.ges.adapter.outbound/Text/10.5.1"/>
+            <defaultName>tcp-server-text-out</defaultName>
+            <description>Sends GeoEvents as text to TCP Server, so they can be displayed in a client application.</description>
+            <properties>
+                <advanced>
+                    <property default="\n" label="Message Separator" name="MessageSeparator" source="adapter"/>
+                    <property default="," label="Attribute Separator" name="AttributeSeparator" source="adapter"/>
+                    <property label="Output Date Format" name="CustomDateFormatType" source="adapter"/>
+                    <property label="Custom Date Format" name="CustomDateFormat" source="adapter"/>
+                    <property label="Language for Number Formatting" name="LocaleForNumberFormatter" source="adapter"/>
+                </advanced>
+                <hidden>
+                    <property default="text/plain" label="MIME Type" name="mimeType" source="adapter"/>
+                    <property default="SERVER" label="Mode" name="mode" source="transport"/>
+                    <property default="60" label="Connection Timeout (Client Mode)" name="clientConnectionTimeout" source="transport"/>
+                    <property default="localhost" label="Host (Client Mode)" name="host" source="transport"/>
+                </hidden>
+                <shown>
+                    <property default="5575" label="Server Port" name="port" source="transport"/>
+                </shown>
+            </properties>
+            <transport uri="com.esri.ges.transport.outbound/TCP/10.5.1"/>
+        </connector>
+        <connector accessType="editable" label="Receive JSON from Azure Event Hub" name="azure-event-hub-json-in" type="inbound">
+            <adapter uri="com.esri.ges.adapter.inbound/Generic-JSON/10.5.1"/>
+            <defaultName>azure-event-hub-json-in</defaultName>
+            <description>Receive JSON from Azure Event Hub</description>
+            <properties>
+                <advanced>
+                    <property label="JSON Object Name" name="JsonObjectName" source="adapter"/>
+                    <property label="Expected Date Format" name="CustomDateFormat" source="adapter"/>
+                    <property default="false" label="Learning Mode" name="isLearningMode" source="adapter"/>
+                    <property default="false" label="As GeoJson" name="asGeoJson" source="adapter"/>
+                </advanced>
+                <hidden/>
+                <shown>
+                    <property label="Event Hub Name" name="eventHubName" source="transport"/>
+                    <property default="$Default" label="Consumer Group Name" name="consumerGroupName" source="transport"/>
+                    <property label="Event Hub Endpoint" name="eventHubEndpoint" source="transport"/>
+                    <property default="service" label="Event Hub Access Policy" name="eventHubAccessPolicy" source="transport"/>
+                    <property label="Event Hub Access Key" name="eventHubAccessKey" source="transport"/>
+                    <property label="Storage Connection String" name="storageConnectionString" source="transport"/>
+                    <property default="true" label="Create GeoEvent Definition" name="CreateGeoEventDefinition" source="adapter"/>
+                    <property label="GeoEvent Definition Name (Existing)" name="ExistingGeoEventDefinitionName" source="adapter"/>
+                    <property default="NewFeatureGeoEventDef" label="GeoEvent Definition Name (New)" name="NewGeoEventDefinitionName" source="adapter"/>
+                    <property default="false" label="Build Geometry From Fields" name="BuildGeometryFromFields" source="adapter"/>
+                    <property label="X Geometry Field" name="XGeometryField" source="adapter"/>
+                    <property label="Y Geometry Field" name="YGeometryField" source="adapter"/>
+                    <property label="Z Geometry Field" name="ZGeometryField" source="adapter"/>
+                    <property label="WKID Field or Default WKID" name="WKIDGeometryField" source="adapter"/>
+                    <property label="Well Known Text Geometry Field" name="WKTextGeometryField" source="adapter"/>
+                </shown>
+            </properties>
+            <transport uri="com.esri.geoevent.transport.inbound/azure-event-hub-in/10.5.0"/>
+        </connector>
+        <connector accessType="editable" label="azure-iot-hub-in" name="azure-iot-hub-in" type="inbound">
+            <adapter uri="com.esri.ges.adapter.inbound/Generic-JSON/10.5.1"/>
+            <defaultName>azure-iot-hub-in</defaultName>
+            <description>azure-iot-hub-in</description>
+            <properties>
+                <advanced/>
+                <hidden/>
+                <shown>
+                    <property label="JSON Object Name" name="JsonObjectName" source="adapter"/>
+                    <property default="true" label="Create GeoEvent Definition" name="CreateGeoEventDefinition" source="adapter"/>
+                    <property label="GeoEvent Definition Name (Existing)" name="ExistingGeoEventDefinitionName" source="adapter"/>
+                    <property default="NewFeatureGeoEventDef" label="GeoEvent Definition Name (New)" name="NewGeoEventDefinitionName" source="adapter"/>
+                    <property label="Expected Date Format" name="CustomDateFormat" source="adapter"/>
+                    <property default="false" label="Build Geometry From Fields" name="BuildGeometryFromFields" source="adapter"/>
+                    <property label="X Geometry Field" name="XGeometryField" source="adapter"/>
+                    <property label="Y Geometry Field" name="YGeometryField" source="adapter"/>
+                    <property label="Z Geometry Field" name="ZGeometryField" source="adapter"/>
+                    <property label="WKID Field or Default WKID" name="WKIDGeometryField" source="adapter"/>
+                    <property label="Well Known Text Geometry Field" name="WKTextGeometryField" source="adapter"/>
+                    <property default="false" label="Learning Mode" name="isLearningMode" source="adapter"/>
+                    <property default="false" label="As GeoJson" name="asGeoJson" source="adapter"/>
+                    <property label="IoT Hub Name" name="hubName" source="transport"/>
+                    <property default="$Default" label="${com.esri.geoevent.transport.azure-iot-hub-transport.CONSUMER_GROUP_NAME_LBL}" name="hubEndpoint" source="transport"/>
+                    <property label="Number of Partitions" name="hubPartitions" source="transport"/>
+                    <property label="Access Policy" name="accessPolicy" source="transport"/>
+                    <property label="Access Key" name="accessKey" source="transport"/>
+                </shown>
+            </properties>
+            <transport uri="com.esri.geoevent.transport.inbound/azure-iot-hub-in/10.5.0"/>
+        </connector>
+        <connector accessType="editable" label="Publish text to a TCP Socket (Server) (Copy)" name="esri-out-text-tcp-client-copy1" type="outbound">
+            <adapter uri="com.esri.ges.adapter.outbound/Text/10.5.1"/>
+            <defaultName>tcp-server-text-out</defaultName>
+            <description>Sends GeoEvents as text to TCP Server, so they can be displayed in a client application.</description>
+            <properties>
+                <advanced>
+                    <property default="\n" label="Message Separator" name="MessageSeparator" source="adapter"/>
+                    <property default="," label="Attribute Separator" name="AttributeSeparator" source="adapter"/>
+                    <property label="Output Date Format" name="CustomDateFormatType" source="adapter"/>
+                    <property label="Custom Date Format" name="CustomDateFormat" source="adapter"/>
+                    <property label="Language for Number Formatting" name="LocaleForNumberFormatter" source="adapter"/>
+                </advanced>
+                <hidden>
+                    <property default="text/plain" label="MIME Type" name="mimeType" source="adapter"/>
+                    <property default="SERVER" label="Mode" name="mode" source="transport"/>
+                    <property default="60" label="Connection Timeout (Client Mode)" name="clientConnectionTimeout" source="transport"/>
+                    <property default="localhost" label="Host (Client Mode)" name="host" source="transport"/>
+                </hidden>
+                <shown>
+                    <property default="5575" label="Server Port" name="port" source="transport"/>
+                </shown>
+            </properties>
+            <transport uri="com.esri.ges.transport.outbound/TCP/10.5.1"/>
+        </connector>
+    </connectors>
+</template>

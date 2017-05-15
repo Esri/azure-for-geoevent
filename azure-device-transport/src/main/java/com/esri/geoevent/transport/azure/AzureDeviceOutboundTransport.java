@@ -41,32 +41,28 @@ import com.microsoft.azure.sdk.iot.service.ServiceClient;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
-public class AzureDeviceOutboundTransport extends OutboundTransportBase implements GeoEventAwareTransport
-{
+public class AzureDeviceOutboundTransport extends OutboundTransportBase implements GeoEventAwareTransport {
   // logger
-  private static final BundleLogger LOGGER                 = BundleLoggerFactory.getLogger(AzureDeviceOutboundTransport.class);
+  private static final BundleLogger LOGGER = BundleLoggerFactory.getLogger(AzureDeviceOutboundTransport.class);
 
   // connection properties
-  private String                    connectionString       = "";
-  private String                    deviceIdGedName        = "";
-  private String                    deviceIdFieldName      = "";
+  private String connectionString = "";
+  private String deviceIdGedName = "";
+  private String deviceIdFieldName = "";
 
-  private volatile boolean          propertiesNeedUpdating = false;
+  private volatile boolean propertiesNeedUpdating = false;
 
   // device id client and receiver
-  private static ServiceClient      serviceClient          = null;
-  private static FeedbackReceiver   feedbackReceiver       = null;
+  private static ServiceClient serviceClient = null;
+  private static FeedbackReceiver feedbackReceiver = null;
 
-  public AzureDeviceOutboundTransport(TransportDefinition definition) throws ComponentException
-  {
+  public AzureDeviceOutboundTransport(TransportDefinition definition) throws ComponentException {
     super(definition);
   }
 
   @Override
-  public synchronized void start()
-  {
-    switch (getRunningState())
-    {
+  public synchronized void start() {
+    switch (getRunningState()) {
       case STARTING:
       case STARTED:
         return;
@@ -77,46 +73,36 @@ public class AzureDeviceOutboundTransport extends OutboundTransportBase implemen
     setup();
   }
 
-  public void readProperties()
-  {
-    try
-    {
+  public void readProperties() {
+    try {
       boolean somethingChanged = false;
 
       // Connection String
-      if (hasProperty(AzureDeviceOutboundTransportDefinition.CONNECTION_STRING_PROPERTY_NAME))
-      {
+      if (hasProperty(AzureDeviceOutboundTransportDefinition.CONNECTION_STRING_PROPERTY_NAME)) {
         String newConnectionString = getProperty(AzureDeviceOutboundTransportDefinition.CONNECTION_STRING_PROPERTY_NAME).getValueAsString();
-        if (!connectionString.equals(newConnectionString))
-        {
+        if (!connectionString.equals(newConnectionString)) {
           connectionString = newConnectionString;
           somethingChanged = true;
         }
       }
       // Device Id GED Name
-      if (hasProperty(AzureDeviceOutboundTransportDefinition.DEVICE_ID_GED_NAME_PROPERTY_NAME))
-      {
+      if (hasProperty(AzureDeviceOutboundTransportDefinition.DEVICE_ID_GED_NAME_PROPERTY_NAME)) {
         String newGEDName = getProperty(AzureDeviceOutboundTransportDefinition.DEVICE_ID_GED_NAME_PROPERTY_NAME).getValueAsString();
-        if (!deviceIdGedName.equals(newGEDName))
-        {
+        if (!deviceIdGedName.equals(newGEDName)) {
           deviceIdGedName = newGEDName;
           somethingChanged = true;
         }
       }
       // Device Id Field Name
-      if (hasProperty(AzureDeviceOutboundTransportDefinition.DEVICE_ID_FIELD_NAME_PROPERTY_NAME))
-      {
+      if (hasProperty(AzureDeviceOutboundTransportDefinition.DEVICE_ID_FIELD_NAME_PROPERTY_NAME)) {
         String newDeviceIdFieldName = getProperty(AzureDeviceOutboundTransportDefinition.DEVICE_ID_FIELD_NAME_PROPERTY_NAME).getValueAsString();
-        if (!deviceIdFieldName.equals(newDeviceIdFieldName))
-        {
+        if (!deviceIdFieldName.equals(newDeviceIdFieldName)) {
           deviceIdFieldName = newDeviceIdFieldName;
           somethingChanged = true;
         }
       }
       propertiesNeedUpdating = somethingChanged;
-    }
-    catch (Exception ex)
-    {
+    } catch (Exception ex) {
       LOGGER.error("INIT_ERROR", ex.getMessage());
       LOGGER.info(ex.getMessage(), ex);
       setErrorMessage(ex.getMessage());
@@ -124,16 +110,13 @@ public class AzureDeviceOutboundTransport extends OutboundTransportBase implemen
     }
   }
 
-  public synchronized void setup()
-  {
+  public synchronized void setup() {
     String errorMessage = null;
     RunningState runningState = RunningState.STARTED;
 
-    try
-    {
+    try {
       readProperties();
-      if (propertiesNeedUpdating)
-      {
+      if (propertiesNeedUpdating) {
         cleanup();
         propertiesNeedUpdating = false;
       }
@@ -152,9 +135,7 @@ public class AzureDeviceOutboundTransport extends OutboundTransportBase implemen
 
       setErrorMessage(errorMessage);
       setRunningState(runningState);
-    }
-    catch (Exception ex)
-    {
+    } catch (Exception ex) {
       LOGGER.error("INIT_ERROR", ex.getMessage());
       LOGGER.info(ex.getMessage(), ex);
       setErrorMessage(ex.getMessage());
@@ -162,59 +143,45 @@ public class AzureDeviceOutboundTransport extends OutboundTransportBase implemen
     }
   }
 
-  protected void cleanup()
-  {
+  protected void cleanup() {
     // clean up the service client
-    if (serviceClient != null)
-    {
-      try
-      {
+    if (serviceClient != null) {
+      try {
         serviceClient.close();
-      }
-      catch (Exception error)
-      {
+      } catch (Exception error) {
         ;
       }
     }
 
     // clean up the receiver
-    if (feedbackReceiver != null)
-    {
-      try
-      {
+    if (feedbackReceiver != null) {
+      try {
         feedbackReceiver.close();
-      }
-      catch (Exception error)
-      {
+      } catch (Exception error) {
         ;
       }
     }
   }
 
   @Override
-  public void receive(ByteBuffer buffer, String channelId)
-  {
+  public void receive(ByteBuffer buffer, String channelId) {
     receive(buffer, channelId, null);
   }
 
   @Override
-  public void receive(ByteBuffer buffer, String channelId, GeoEvent geoEvent)
-  {
-    if (isRunning())
-    {
+  public void receive(ByteBuffer buffer, String channelId, GeoEvent geoEvent) {
+    if (isRunning()) {
       if (geoEvent == null)
         return;
 
-      try
-      {
+      try {
         // Send Event to a Device
         Object deviceIdObj = geoEvent.getField(deviceIdFieldName);
         String deviceId = "";
         if (deviceIdObj != null)
           deviceId = deviceIdObj.toString();
 
-        if (Validator.isNotBlank(deviceId))
-        {
+        if (Validator.isNotBlank(deviceId)) {
           String messageStr = new String(buffer.array(), StandardCharsets.UTF_8);
           Message message = new Message(messageStr);
           serviceClient.sendAsync(deviceId, message);
@@ -222,22 +189,16 @@ public class AzureDeviceOutboundTransport extends OutboundTransportBase implemen
           // receive feedback from the device
           // FeedbackBatch feedback = feedbackReceiver.receive(10000);
           // feedback.toString();
-        }
-        else
-        {
+        } else {
           LOGGER.warn("FAILED_TO_SEND_INVALID_DEVICE_ID", deviceIdFieldName);
         }
-      }
-      catch (Exception e)
-      {
+      } catch (Exception e) {
         // streamClient.stop();
         setErrorMessage(e.getMessage());
         LOGGER.error(e.getMessage(), e);
         setRunningState(RunningState.ERROR);
       }
-    }
-    else
-    {
+    } else {
       LOGGER.debug("RECEIVED_BUFFER_WHEN_STOPPED", "");
     }
   }

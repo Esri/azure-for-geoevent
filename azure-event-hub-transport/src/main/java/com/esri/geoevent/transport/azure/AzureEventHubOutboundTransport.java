@@ -24,9 +24,6 @@
 
 package com.esri.geoevent.transport.azure;
 
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
-
 import com.esri.ges.core.component.ComponentException;
 import com.esri.ges.core.component.RunningState;
 import com.esri.ges.core.geoevent.GeoEvent;
@@ -37,40 +34,29 @@ import com.esri.ges.transport.OutboundTransportBase;
 import com.esri.ges.transport.TransportDefinition;
 import com.microsoft.azure.eventhubs.EventData;
 import com.microsoft.azure.eventhubs.EventHubClient;
-import com.microsoft.azure.sdk.iot.device.*;
 
-public class AzureEventHubOutboundTransport extends OutboundTransportBase implements GeoEventAwareTransport, IotHubEventCallback
-{
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+
+public class AzureEventHubOutboundTransport extends OutboundTransportBase implements GeoEventAwareTransport {
   // logger
-  private static final BundleLogger LOGGER                 = BundleLoggerFactory.getLogger(AzureEventHubInboundTransport.class);
+  private static final BundleLogger LOGGER = BundleLoggerFactory.getLogger(AzureEventHubInboundTransport.class);
 
   // connection properties
-  private String                    connectionString       = "";
+  private String connectionString = "";
 
-  private volatile boolean          propertiesNeedUpdating = false;
+  private volatile boolean propertiesNeedUpdating = false;
 
   // event hub client
-  EventHubClient                    ehClient               = null;
-  DeviceClient                      deviceClient           = null;
+  EventHubClient ehClient = null;
 
-  public AzureEventHubOutboundTransport(TransportDefinition definition) throws ComponentException
-  {
+  public AzureEventHubOutboundTransport(TransportDefinition definition) throws ComponentException {
     super(definition);
   }
 
   @Override
-  public void execute(IotHubStatusCode status, Object context)
-  {
-    Integer i = (Integer) context;
-    System.out.println("IoT Hub responded to message " + i.toString()
-        + " with status " + status.name());
-  }
-
-  @Override
-  public synchronized void start()
-  {
-    switch (getRunningState())
-    {
+  public synchronized void start() {
+    switch (getRunningState()) {
       case STARTING:
       case STARTED:
         return;
@@ -81,26 +67,20 @@ public class AzureEventHubOutboundTransport extends OutboundTransportBase implem
     setup();
   }
 
-  public void readProperties()
-  {
-    try
-    {
+  public void readProperties() {
+    try {
       boolean somethingChanged = false;
 
       // Connection String
-      if (hasProperty(AzureEventHubOutboundTransportDefinition.CONNECTION_STRING_PROPERTY_NAME))
-      {
+      if (hasProperty(AzureEventHubOutboundTransportDefinition.CONNECTION_STRING_PROPERTY_NAME)) {
         String newConnectionString = getProperty(AzureEventHubOutboundTransportDefinition.CONNECTION_STRING_PROPERTY_NAME).getValueAsString();
-        if (!connectionString.equals(newConnectionString))
-        {
+        if (!connectionString.equals(newConnectionString)) {
           connectionString = newConnectionString;
           somethingChanged = true;
         }
       }
       propertiesNeedUpdating = somethingChanged;
-    }
-    catch (Exception ex)
-    {
+    } catch (Exception ex) {
       LOGGER.error("INIT_ERROR", ex.getMessage());
       LOGGER.info(ex.getMessage(), ex);
       setErrorMessage(ex.getMessage());
@@ -108,48 +88,28 @@ public class AzureEventHubOutboundTransport extends OutboundTransportBase implem
     }
   }
 
-  public synchronized void setup()
-  {
+  public synchronized void setup() {
     String errorMessage = null;
     RunningState runningState = RunningState.STARTED;
 
-    try
-    {
+    try {
       readProperties();
-      if (propertiesNeedUpdating)
-      {
+      if (propertiesNeedUpdating) {
         cleanup();
         propertiesNeedUpdating = false;
       }
 
-      if (connectionString.startsWith("Endpoint="))
-      {
-        // setup Event Hub
-        ehClient = EventHubClient.createFromConnectionStringSync(connectionString);
-        if (ehClient == null) {
-          runningState = RunningState.ERROR;
-          errorMessage = LOGGER.translate("FAILED_TO_CREATE_EH_CLIENT", connectionString);
-          LOGGER.error(errorMessage);
-        }
-      }
-      else
-      {
-        // setup the device client
-        deviceClient = new DeviceClient(connectionString, IotHubClientProtocol.AMQPS);
-        if (deviceClient == null) {
-          runningState = RunningState.ERROR;
-          errorMessage = LOGGER.translate("FAILED_TO_CREATE_EH_CLIENT", connectionString);
-          LOGGER.error(errorMessage);
-        } else {
-          deviceClient.open();
-        }
+      // setup Event Hub
+      ehClient = EventHubClient.createFromConnectionStringSync(connectionString);
+      if (ehClient == null) {
+        runningState = RunningState.ERROR;
+        errorMessage = LOGGER.translate("FAILED_TO_CREATE_EH_CLIENT", connectionString);
+        LOGGER.error(errorMessage);
       }
 
       setErrorMessage(errorMessage);
       setRunningState(runningState);
-    }
-    catch (Exception ex)
-    {
+    } catch (Exception ex) {
       LOGGER.error("INIT_ERROR", ex.getMessage());
       LOGGER.info(ex.getMessage(), ex);
       setErrorMessage(ex.getMessage());
@@ -157,83 +117,46 @@ public class AzureEventHubOutboundTransport extends OutboundTransportBase implem
     }
   }
 
-  protected void cleanup()
-  {
+  protected void cleanup() {
     // clean up the event hub client
-    if (ehClient != null)
-    {
-      try
-      {
+    if (ehClient != null) {
+      try {
         ehClient.close();
-      }
-      catch (Exception error)
-      {
-        ;
-      }
-    }
-
-    // clean up the device client
-    if (deviceClient != null)
-    {
-      try
-      {
-        deviceClient.close();
-      }
-      catch (Exception error)
-      {
+      } catch (Exception error) {
         ;
       }
     }
   }
 
   @Override
-  public void receive(ByteBuffer buffer, String channelId)
-  {
+  public void receive(ByteBuffer buffer, String channelId) {
     receive(buffer, channelId, null);
   }
 
   @Override
-  public void receive(ByteBuffer buffer, String channelId, GeoEvent geoEvent)
-  {
-    if (isRunning())
-    {
+  public void receive(ByteBuffer buffer, String channelId, GeoEvent geoEvent) {
+    if (isRunning()) {
       if (geoEvent == null)
         return;
 
-      try
-      {
+      try {
         // Send Event to an Event Hub
         String messageStr = new String(buffer.array(), StandardCharsets.UTF_8);
 
-        if (ehClient != null)
-        {
+        if (ehClient != null) {
           byte[] bytes = messageStr.getBytes(StandardCharsets.UTF_8); // "UTF_8"
           EventData eventData = new EventData(bytes);
           ehClient.sendSync(eventData);
-        }
-        else if (deviceClient != null)
-        {
-          String callbackContext = "1";
-          Message message = new Message(messageStr);
-          message.setProperty("messageCount", callbackContext);
-          //message.setExpiryTime(5000);
-          deviceClient.sendEventAsync(message, this, callbackContext);
-        }
-        else
-        {
+        } else {
           LOGGER.warn("FAILED_TO_SEND_INVALID_EH_CONNECTION", connectionString);
         }
-      }
-      catch (Exception e)
-      {
+      } catch (Exception e) {
         // streamClient.stop();
         setErrorMessage(e.getMessage());
         LOGGER.error(e.getMessage(), e);
         setRunningState(RunningState.ERROR);
       }
-    }
-    else
-    {
+    } else {
       LOGGER.debug("RECEIVED_BUFFER_WHEN_STOPPED", "");
     }
   }

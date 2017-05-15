@@ -18,6 +18,7 @@
   </properties>
 
   <modules>
+    <module>azure-iot-hub-transport</module>
     <module>azure-event-hub-transport</module>
     <module>azure-device-transport</module>
   </modules>

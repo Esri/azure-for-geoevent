@@ -33,53 +33,54 @@ import com.esri.ges.transport.TransportDefinitionBase;
 import com.esri.ges.transport.TransportType;
 import com.microsoft.azure.eventhubs.EventHubClient;
 
-public class AzureEventHubInboundTransportDefinition extends TransportDefinitionBase
-{
+public class AzureEventHubInboundTransportDefinition extends TransportDefinitionBase {
   // logger
-  private static final BundleLogger LOGGER                                      = BundleLoggerFactory.getLogger(AzureEventHubInboundTransportDefinition.class);
+  private static final BundleLogger LOGGER = BundleLoggerFactory.getLogger(AzureEventHubInboundTransportDefinition.class);
 
   // property names
-  public static final String        CONSUMER_GROUP_NAME_PROPERTY_NAME           = "consumerGroupName";
-  public static final String        EVENT_HUB_CONNECTION_STRING_PROPERTY_NAME   = "eventHubConnectionString";
-  public static final String        EVENT_HUB_NUMBER_OF_PARTITION_PROPERTY_NAME = "eventHubNumberOfPartitions";
+  public static final String EVENT_HUB_NAME_PROPERTY_NAME = "eventHubName";
+  public static final String EVENT_HUB_CONSUMER_GROUP_NAME_PROPERTY_NAME = "consumerGroupName";
+  public static final String EVENT_HUB_ENDPOINT_PROPERTY_NAME = "eventHubEndpoint";
+  public static final String EVENT_HUB_ACCESS_POLICY_PROPERTY_NAME = "eventHubAccessPolicy";
+  public static final String EVENT_HUB_ACCESS_KEY_PROPERTY_NAME = "eventHubAccessKey";
+  public static final String STORAGE_CONNECTION_STRING_PROPERTY_NAME = "storageConnectionString";
 
-  public AzureEventHubInboundTransportDefinition()
-  {
+  // defaults
+  public static final String DEFAULT_CONSUMER_GROUP_NAME = EventHubClient.DEFAULT_CONSUMER_GROUP_NAME;
+  public static final String DEFAULT_EVENT_HUB_ACCESS_POLICY = "service";
+
+  public AzureEventHubInboundTransportDefinition() {
     super(TransportType.INBOUND);
-    try
-    {
-      propertyDefinitions.put(CONSUMER_GROUP_NAME_PROPERTY_NAME, new PropertyDefinition(CONSUMER_GROUP_NAME_PROPERTY_NAME, PropertyType.String, EventHubClient.DEFAULT_CONSUMER_GROUP_NAME, "${com.esri.geoevent.transport.azure-event-hub-transport.CONSUMER_GROUP_NAME_LBL}", "${com.esri.geoevent.transport.azure-event-hub-transport.CONSUMER_GROUP_NAME_DESC}", true, false));
-      propertyDefinitions.put(EVENT_HUB_CONNECTION_STRING_PROPERTY_NAME, new PropertyDefinition(EVENT_HUB_CONNECTION_STRING_PROPERTY_NAME, PropertyType.String, null, "${com.esri.geoevent.transport.azure-event-hub-transport.EVENT_HUB_CONNECTION_STRING_LBL}", "${com.esri.geoevent.transport.azure-event-hub-transport.EVENT_HUB_CONNECTION_STRING_DESC}", true, false));
-      propertyDefinitions.put(EVENT_HUB_NUMBER_OF_PARTITION_PROPERTY_NAME, new PropertyDefinition(EVENT_HUB_NUMBER_OF_PARTITION_PROPERTY_NAME, PropertyType.Integer, 4, "${com.esri.geoevent.transport.azure-event-hub-transport.NUMBER_OF_PARTITIONS_LBL}", "${com.esri.geoevent.transport.azure-event-hub-transport.NUMBER_OF_PARTITIONS_DESC}", true, false));
-    }
-    catch (PropertyException error)
-    {
+    try {
+      propertyDefinitions.put(EVENT_HUB_NAME_PROPERTY_NAME, new PropertyDefinition(EVENT_HUB_NAME_PROPERTY_NAME, PropertyType.String, null, "${com.esri.geoevent.transport.azure-event-hub-transport.EVENT_HUB_PATH_LBL}", "${com.esri.geoevent.transport.azure-event-hub-transport.EVENT_HUB_NAME_DESC}", true, false));
+      propertyDefinitions.put(EVENT_HUB_CONSUMER_GROUP_NAME_PROPERTY_NAME, new PropertyDefinition(EVENT_HUB_CONSUMER_GROUP_NAME_PROPERTY_NAME, PropertyType.String, DEFAULT_CONSUMER_GROUP_NAME, "${com.esri.geoevent.transport.azure-event-hub-transport.EVENT_HUB_CONSUMER_GROUP_NAME_LBL}", "${com.esri.geoevent.transport.azure-event-hub-transport.EVENT_HUB_CONSUMER_GROUP_NAME_DESC}", true, false));
+      propertyDefinitions.put(EVENT_HUB_ENDPOINT_PROPERTY_NAME, new PropertyDefinition(EVENT_HUB_ENDPOINT_PROPERTY_NAME, PropertyType.String, null, "${com.esri.geoevent.transport.azure-event-hub-transport.EVENT_HUB_ENDPOINT_LBL}", "${com.esri.geoevent.transport.azure-event-hub-transport.EVENT_HUB_ENDPOINT_DESC}", true, false));
+      propertyDefinitions.put(EVENT_HUB_ACCESS_POLICY_PROPERTY_NAME, new PropertyDefinition(EVENT_HUB_ACCESS_POLICY_PROPERTY_NAME, PropertyType.String, DEFAULT_EVENT_HUB_ACCESS_POLICY, "${com.esri.geoevent.transport.azure-event-hub-transport.EVENT_HUB_ACCESS_POLICY_LBL}", "${com.esri.geoevent.transport.azure-event-hub-transport.EVENT_HUB_ACCESS_POLICY_DESC}", true, false));
+      propertyDefinitions.put(EVENT_HUB_ACCESS_KEY_PROPERTY_NAME, new PropertyDefinition(EVENT_HUB_ACCESS_KEY_PROPERTY_NAME, PropertyType.String, null, "${com.esri.geoevent.transport.azure-event-hub-transport.EVENT_HUB_ACCESS_KEY_LBL}", "${com.esri.geoevent.transport.azure-event-hub-transport.EVENT_HUB_ACCESS_KEY_DESC}", true, false));
+      propertyDefinitions.put(STORAGE_CONNECTION_STRING_PROPERTY_NAME, new PropertyDefinition(STORAGE_CONNECTION_STRING_PROPERTY_NAME, PropertyType.String, null, "${com.esri.geoevent.transport.azure-event-hub-transport.STORAGE_CONNECTION_STRING_LBL}", "${com.esri.geoevent.transport.azure-event-hub-transport.STORAGE_CONNECTION_STRING_DESC}", true, false));
+    } catch (PropertyException error) {
       LOGGER.error("ERROR_LOADING_TRANSPORT_DEFINITION", error);
       throw new RuntimeException(error);
     }
   }
 
   @Override
-  public String getName()
-  {
+  public String getName() {
     return "azure-event-hub-in";
   }
 
   @Override
-  public String getLabel()
-  {
+  public String getLabel() {
     return "${com.esri.geoevent.transport.azure-event-hub-transport.TRANSPORT_IN_LABEL}";
   }
 
   @Override
-  public String getDomain()
-  {
+  public String getDomain() {
     return "com.esri.geoevent.transport.inbound";
   }
 
   @Override
-  public String getDescription()
-  {
+  public String getDescription() {
     return "${com.esri.geoevent.transport.azure-event-hub-transport.TRANSPORT_IN_DESC}";
   }
 }

@@ -21,13 +21,8 @@
 
   email: contracts@esri.com
  */
-package com.esri.geoevent.transport.azure;
 
-import java.io.IOException;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.time.Instant;
-import java.util.concurrent.ExecutionException;
+package com.esri.geoevent.transport.azure;
 
 import com.esri.ges.core.component.ComponentException;
 import com.esri.ges.core.component.RunningState;
@@ -37,37 +32,46 @@ import com.esri.ges.transport.InboundTransportBase;
 import com.esri.ges.transport.TransportDefinition;
 import com.microsoft.azure.eventhubs.EventData;
 import com.microsoft.azure.eventhubs.EventHubClient;
-import com.microsoft.azure.eventhubs.PartitionReceiveHandler;
-import com.microsoft.azure.eventhubs.PartitionReceiver;
+import com.microsoft.azure.eventprocessorhost.*;
 import com.microsoft.azure.servicebus.ConnectionStringBuilder;
-import com.microsoft.azure.servicebus.ServiceBusException;
 
-public class AzureEventHubInboundTransport extends InboundTransportBase
-{
+import java.net.URI;
+import java.nio.BufferOverflowException;
+import java.nio.ByteBuffer;
+import java.time.Instant;
+import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
+
+public class AzureEventHubInboundTransport extends InboundTransportBase {
+  // based on the microsoft's azure-eventhubs-eph API:
+  // https://azure.microsoft.com/en-us/documentation/articles/event-hubs-java-ephjava-getstarted/#receive-messages-with-eventprocessorhost-in-java
+  // https://github.com/Azure/azure-event-hubs-java/tree/e6413d059471d75224a62df89251c5dfd331f5e2/azure-eventhubs-eph
+  // https://github.com/Azure/azure-event-hubs/tree/master/java
+
   // logger
-  private static final BundleLogger LOGGER                     = BundleLoggerFactory.getLogger(AzureEventHubInboundTransport.class);
-  private static final int          MAX_EVENT_COUNT            = 990;
+  private static final BundleLogger LOGGER = BundleLoggerFactory.getLogger(AzureEventHubInboundTransport.class);
 
-  // transport properties
-  private String                    consumerGroupName          = EventHubClient.DEFAULT_CONSUMER_GROUP_NAME;
-  private String                    eventHubConnectionString   = "";
-  private int                       eventHubNumberOfPartitions = 4;
+  private String eventHubName = ""; // e.g. "hkiot1"
+  private String eventHubConsumerGroupName = EventHubClient.DEFAULT_CONSUMER_GROUP_NAME;
+  private String eventHubEndpoint = "";  // e.g. // "sb://iothub-ns-hkiot1-144429-38bfd49a46.servicebus.windows.net/";
+  private String eventHubAccessPolicy = "";  // sasKeyName
+  private String eventHubAccessKey = "";  // sasKey
+  private String storageConnectionString = "";
 
-  // data members
-  private PartitionReceiver[]       receivers;
-  private EventHubClient[]          ehClients;
-  private String                    errorMessage;
+  private EventProcessor eventProcessor = null;
+  private EventProcessorFactory eventProcessorFactory = null;
+  private EventProcessorHost host = null;
+  private String errorMessage = null;
 
-  public AzureEventHubInboundTransport(TransportDefinition definition) throws ComponentException
-  {
+  public AzureEventHubInboundTransport(TransportDefinition definition) throws ComponentException {
     super(definition);
+    eventProcessor = new EventProcessor();
+    eventProcessorFactory = new EventProcessorFactory();
   }
 
   @Override
-  public synchronized void start()
-  {
-    switch (getRunningState())
-    {
+  public synchronized void start() {
+    switch (getRunningState()) {
       case STARTING:
       case STARTED:
       case ERROR:
@@ -75,175 +79,123 @@ public class AzureEventHubInboundTransport extends InboundTransportBase
       default:
     }
     setRunningState(RunningState.STARTING);
-    createReceivers();
+    createNewHost();
   }
 
   @Override
-  public synchronized void stop()
-  {
+  public synchronized void stop() {
     if (getRunningState() == RunningState.STOPPING)
       return;
 
     errorMessage = null;
     setRunningState(RunningState.STOPPING);
-    cleanup();
+    cleanup(false);
     // setErrorMessage(null);
     setRunningState(RunningState.STOPPED);
   }
 
-  protected void cleanup()
-  {
-    for (PartitionReceiver receiver : receivers)
-    {
-      if (receiver != null)
-      {
-        try
-        {
-          receiver.closeSync();
+  protected void cleanup(boolean completeProcessShutDown) {
+    if (host != null) {
+      try {
+        host.unregisterEventProcessor();
+      } catch (Exception ignored) {
+      }
+      host = null;
+
+      if (completeProcessShutDown) {
+        try {
+          EventProcessorHost.forceExecutorShutdown(120);
+        } catch (Exception ignored) {
         }
-        catch (Exception e)
-        {
-          LOGGER.warn("CLEANUP_ERROR", e);
-        }
-        receiver = null;
       }
     }
-    for (EventHubClient ehClient : ehClients)
-    {
-      if (ehClient != null)
-      {
-        try
-        {
-          ehClient.closeSync();
-        }
-        catch (ServiceBusException e)
-        {
-          LOGGER.warn("CLEANUP_ERROR", e);
-        }
-        ehClient = null;
-      }
-    }
-    LOGGER.debug("CLEANUP_COMPLETE");
   }
 
   @Override
-  public void validate()
-  {
+  public void validate() {
     // TODO: Validate
   }
 
   @Override
-  public synchronized boolean isRunning()
-  {
+  public synchronized boolean isRunning() {
     return (getRunningState() == RunningState.STARTED);
   }
 
-  public void readProperties() throws Exception
-  {
-    try
-    {
-      consumerGroupName = getProperty(AzureEventHubInboundTransportDefinition.CONSUMER_GROUP_NAME_PROPERTY_NAME).getValueAsString();
-      eventHubConnectionString = getProperty(AzureEventHubInboundTransportDefinition.EVENT_HUB_CONNECTION_STRING_PROPERTY_NAME).getValueAsString();
-      eventHubNumberOfPartitions = Integer.parseInt(getProperty(AzureEventHubInboundTransportDefinition.EVENT_HUB_NUMBER_OF_PARTITION_PROPERTY_NAME).getValueAsString());
-    }
-    catch (Exception e)
-    {
+  public void readProperties() throws Exception {
+    try {
+      eventHubName = getProperty(AzureEventHubInboundTransportDefinition.EVENT_HUB_NAME_PROPERTY_NAME).getValueAsString();
+      eventHubConsumerGroupName = getProperty(AzureEventHubInboundTransportDefinition.EVENT_HUB_CONSUMER_GROUP_NAME_PROPERTY_NAME).getValueAsString();
+      eventHubEndpoint = getProperty(AzureEventHubInboundTransportDefinition.EVENT_HUB_ENDPOINT_PROPERTY_NAME).getValueAsString();
+      eventHubAccessPolicy = getProperty(AzureEventHubInboundTransportDefinition.EVENT_HUB_ACCESS_POLICY_PROPERTY_NAME).getValueAsString();
+      eventHubAccessKey = getProperty(AzureEventHubInboundTransportDefinition.EVENT_HUB_ACCESS_KEY_PROPERTY_NAME).getValueAsString();
+      storageConnectionString = getProperty(AzureEventHubInboundTransportDefinition.STORAGE_CONNECTION_STRING_PROPERTY_NAME).getValueAsString();
+    } catch (Exception e) {
       errorMessage = LOGGER.translate("ERROR_READING_PROPS");
       LOGGER.error("ERROR_READING_PROPS", e);
     }
   }
 
-  private void createReceivers()
-  {
-    try
-    {
+  private void createNewHost() {
+    try {
+      cleanup(false);
+
       errorMessage = null;
       readProperties();
 
-      receivers = new PartitionReceiver[eventHubNumberOfPartitions];
-      ehClients = new EventHubClient[eventHubNumberOfPartitions];
+      URI eventHubEndpointUri = new URI(eventHubEndpoint);
+      ConnectionStringBuilder builder = new ConnectionStringBuilder(eventHubEndpointUri, eventHubName, eventHubAccessPolicy, eventHubAccessKey);
+      String eventHubConnectionString = builder.toString();
 
-      for (int partitionId = 0; partitionId < eventHubNumberOfPartitions; partitionId++)
-      {
-        createEventHubClient(partitionId);
-        createPartitionReceiver(partitionId);
-      }
+      // create a connection string builder based on the event hub namespace
+      // "iothub-ns-hkiot1-144429-38bfd49a46" (from
+      // "sb://iothub-ns-hkiot1-144429-38bfd49a46.servicebus.windows.net/")
+      // String namespaceName = eventHubEndpointUri.getHost();
+      // namespaceName = namespaceName.substring(0,
+      // namespaceName.lastIndexOf(".servicebus.windows.net"));
+      // ConnectionStringBuilder builder = new
+      // ConnectionStringBuilder(namespaceName, eventHubName, sasKeyName,
+      // sasKey);
 
-      LOGGER.debug("RECEIVERS_CREATED");
+      host = new EventProcessorHost(eventHubName, eventHubConsumerGroupName, eventHubConnectionString, storageConnectionString);
+      EventProcessorOptions options = EventProcessorOptions.getDefaultOptions();
+      options.setExceptionNotification(new ErrorNotificationHandler());
+      options.setInitialOffsetProvider((partitionId) -> {
+        return Instant.now();
+      });
+      host.registerEventProcessorFactory(eventProcessorFactory, options).get();
+
       setRunningState(RunningState.STARTED);
-    }
-    catch (Exception error)
-    {
-      errorMessage = LOGGER.translate("CREATE_EVENT_HUB_RECEIVER_ERROR", error.getMessage());
-      LOGGER.error(errorMessage, error);
+    } catch (Exception error) {
+      String errorMsg = "";
+      // System.out.print("Failure while registering: ");
+      if (error instanceof ExecutionException) {
+        Throwable inner = error.getCause();
+        errorMsg = inner.toString();
+      } else {
+        errorMsg = error.toString(); // error.getMessage()
+      }
+      this.errorMessage = LOGGER.translate("CREATE_EVENT_HUB_RECEIVER_ERROR", errorMsg);
       setRunningState(RunningState.ERROR);
-      cleanup();
     }
   }
 
-  private void createEventHubClient(int partitionId) throws InterruptedException, ExecutionException, ServiceBusException, IOException
-  {
-    EventHubClient ehClient = EventHubClient.createFromConnectionString(eventHubConnectionString).get();
-    if (ehClient != null)
-    {
-      ehClients[partitionId] = ehClient;
-      LOGGER.debug("CREATED_EVENT_HUB_CLIENT", partitionId);
-    }
-  }
-
-  private void createPartitionReceiver(int partitionId) throws Exception
-  {
-    EventHubClient ehClient = ehClients[partitionId];
-    if (receivers[partitionId] != null)
-    {
-      try
-      {
-        receivers[partitionId].closeSync();
-      }
-      catch (ServiceBusException ignored)
-      {
-      }
-      receivers[partitionId] = null;
-    }
-
-    PartitionReceiver receiver = ehClient.createReceiver(consumerGroupName, Integer.toString(partitionId), Instant.now()).get();
-
-    if (receiver != null)
-    {
-      receiver.setReceiveHandler(new EventHandler(MAX_EVENT_COUNT, partitionId));
-      receivers[partitionId] = receiver;
-      LOGGER.debug("CREATED_CLIENT_RECEIVER", partitionId);
-    }
-    else
-    {
-      throw new Exception(LOGGER.translate("UNABLE_TO_CREATE_RECEIVER", partitionId));
-    }
-  }
-
-  private void receive(byte[] bytes)
-  {
-    if (bytes != null && bytes.length > 0)
-    {
+  private void receive(byte[] bytes) {
+    if (bytes != null && bytes.length > 0) {
       String str = new String(bytes);
       str = str + '\n';
       byte[] newBytes = str.getBytes();
 
       ByteBuffer bb = ByteBuffer.allocate(newBytes.length);
-      try
-      {
+      try {
         bb.put(newBytes);
         bb.flip();
         byteListener.receive(bb, "");
         bb.clear();
-      }
-      catch (BufferOverflowException boe)
-      {
+      } catch (BufferOverflowException boe) {
         LOGGER.error("BUFFER_OVERFLOW_ERROR", boe);
         bb.clear();
         setRunningState(RunningState.ERROR);
-      }
-      catch (Exception e)
-      {
+      } catch (Exception e) {
         LOGGER.error("UNEXPECTED_ERROR", e);
         stop();
         setRunningState(RunningState.ERROR);
@@ -251,54 +203,70 @@ public class AzureEventHubInboundTransport extends InboundTransportBase
     }
   }
 
-  public final class EventHandler extends PartitionReceiveHandler
-  {
-    private int partitionId;
-
-    public EventHandler(final int maxEventCount, final int partitionId)
-    {
-      super(maxEventCount);
-      this.partitionId = partitionId;
-    }
-
-    @Override
-    public void onReceive(Iterable<EventData> events)
-    {
-      if (events == null)
-        return;
-
-      for (EventData event : events)
-      {
-        // String message = new String(event.getBody(),
-        receive(event.getBytes());
-      }
-    }
-
-    @Override
-    public void onError(Throwable error)
-    {
-      LOGGER.warn("EVENT_HUB_RECEIVER_ERROR", error);
-      try
-      {
-        // recreate the partition receiver
-        createPartitionReceiver(partitionId);
-      }
-      catch (Exception ignored)
-      {
-      }
-    }
-  }
-
   @Override
-  public String getStatusDetails()
-  {
+  public String getStatusDetails() {
     return errorMessage;
   }
 
   @Override
-  public boolean isClusterable()
-  {
+  public boolean isClusterable() {
     return false;
+  }
+
+  public final class EventProcessor implements IEventProcessor {
+    @Override
+    public void onOpen(PartitionContext context) throws Exception {
+      String message = "Partition " + context.getPartitionId() + " is opening";
+      // System.out.println(message);
+      // TODO - localize
+      LOGGER.info(message);
+    }
+
+    @Override
+    public void onClose(PartitionContext context, CloseReason reason) throws Exception {
+      String message = "Partition " + context.getPartitionId() + " is closing for reason " + reason.toString();
+      // System.out.println(message);
+      // TODO - localize
+      LOGGER.info(message);
+    }
+
+    @Override
+    public void onError(PartitionContext context, Throwable error) {
+      // String message = "Partition " + context.getPartitionId() + " got error
+      // " + error.toString();
+      // System.out.println(message);
+      LOGGER.warn("EVENT_HUB_RECEIVER_ERROR", error);
+      LOGGER.error(errorMessage, error);
+      // setRunningState(RunningState.ERROR);
+      // cleanup(false);
+    }
+
+    @Override
+    public void onEvents(PartitionContext context, Iterable<EventData> events) throws Exception {
+      if (events == null)
+        return;
+
+      for (EventData event : events) {
+        // String message = new String(event.getBytes(),
+        receive(event.getBytes());
+        // context.checkpoint(event);
+      }
+    }
+  }
+
+  public final class EventProcessorFactory implements IEventProcessorFactory<EventProcessor> {
+    @Override
+    public EventProcessor createEventProcessor(PartitionContext context) throws Exception {
+      return eventProcessor;
+    }
+  }
+
+  public final class ErrorNotificationHandler implements Consumer<ExceptionReceivedEventArgs> {
+    @Override
+    public void accept(ExceptionReceivedEventArgs error) {
+      LOGGER.warn("EVENT_HUB_RECEIVER_ERROR", error);
+      LOGGER.error(errorMessage, error);
+    }
   }
 
 }

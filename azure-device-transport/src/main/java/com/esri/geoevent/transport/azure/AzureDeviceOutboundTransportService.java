@@ -28,16 +28,13 @@ import com.esri.ges.core.component.ComponentException;
 import com.esri.ges.transport.Transport;
 import com.esri.ges.transport.TransportServiceBase;
 
-public class AzureDeviceOutboundTransportService extends TransportServiceBase
-{
-  public AzureDeviceOutboundTransportService()
-  {
+public class AzureDeviceOutboundTransportService extends TransportServiceBase {
+  public AzureDeviceOutboundTransportService() {
     definition = new AzureDeviceOutboundTransportDefinition();
   }
 
   @Override
-  public Transport createTransport() throws ComponentException
-  {
+  public Transport createTransport() throws ComponentException {
     return new AzureDeviceOutboundTransport(definition);
   }
 }

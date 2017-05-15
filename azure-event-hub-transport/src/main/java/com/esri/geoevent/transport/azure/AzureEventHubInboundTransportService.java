@@ -28,16 +28,13 @@ import com.esri.ges.core.component.ComponentException;
 import com.esri.ges.transport.Transport;
 import com.esri.ges.transport.TransportServiceBase;
 
-public class AzureEventHubInboundTransportService extends TransportServiceBase
-{
-  public AzureEventHubInboundTransportService()
-  {
+public class AzureEventHubInboundTransportService extends TransportServiceBase {
+  public AzureEventHubInboundTransportService() {
     definition = new AzureEventHubInboundTransportDefinition();
   }
 
   @Override
-  public Transport createTransport() throws ComponentException
-  {
+  public Transport createTransport() throws ComponentException {
     return new AzureEventHubInboundTransport(definition);
   }
 }
