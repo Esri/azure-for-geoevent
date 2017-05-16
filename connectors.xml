@@ -71,29 +71,5 @@
             </properties>
             <transport uri="com.esri.geoevent.transport.inbound/azure-event-hub-in/10.5.0"/>
         </connector>
-        <connector accessType="editable" label="Publish text to a TCP Socket (Server)" name="esri-out-text-tcp-server" type="outbound">
-            <adapter uri="com.esri.ges.adapter.outbound/Text/10.5.0"/>
-            <defaultName>tcp-server-text-out</defaultName>
-            <description>Sends GeoEvents as text to TCP Server, so they can be displayed in a client application.</description>
-            <properties>
-                <advanced>
-                    <property default="\n" label="Message Separator" name="MessageSeparator" source="adapter"/>
-                    <property default="," label="Attribute Separator" name="AttributeSeparator" source="adapter"/>
-                    <property label="Output Date Format" name="CustomDateFormatType" source="adapter"/>
-                    <property label="Custom Date Format" name="CustomDateFormat" source="adapter"/>
-                    <property label="Language for Number Formatting" name="LocaleForNumberFormatter" source="adapter"/>
-                </advanced>
-                <hidden>
-                    <property default="text/plain" label="MIME Type" name="mimeType" source="adapter"/>
-                    <property default="SERVER" label="Mode" name="mode" source="transport"/>
-                    <property default="60" label="Connection Timeout (Client Mode)" name="clientConnectionTimeout" source="transport"/>
-                    <property default="localhost" label="Host (Client Mode)" name="host" source="transport"/>
-                </hidden>
-                <shown>
-                    <property default="5575" label="Server Port" name="port" source="transport"/>
-                </shown>
-            </properties>
-            <transport uri="com.esri.ges.transport.outbound/TCP/10.5.0"/>
-        </connector>
     </connectors>
 </template>
