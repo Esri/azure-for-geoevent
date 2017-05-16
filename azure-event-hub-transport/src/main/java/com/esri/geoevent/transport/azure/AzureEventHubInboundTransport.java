@@ -53,9 +53,12 @@ public class AzureEventHubInboundTransport extends InboundTransportBase {
 
   private String eventHubName = ""; // e.g. "hkiot1"
   private String eventHubConsumerGroupName = EventHubClient.DEFAULT_CONSUMER_GROUP_NAME;
+  private boolean provideEventHubConnectionString = false;
+  private String eventHubConnectionString = "";
   private String eventHubEndpoint = "";  // e.g. // "sb://iothub-ns-hkiot1-144429-38bfd49a46.servicebus.windows.net/";
   private String eventHubAccessPolicy = "";  // sasKeyName
   private String eventHubAccessKey = "";  // sasKey
+
   private String storageConnectionString = "";
 
   private EventProcessor eventProcessor = null;
@@ -125,6 +128,8 @@ public class AzureEventHubInboundTransport extends InboundTransportBase {
     try {
       eventHubName = getProperty(AzureEventHubInboundTransportDefinition.EVENT_HUB_NAME_PROPERTY_NAME).getValueAsString();
       eventHubConsumerGroupName = getProperty(AzureEventHubInboundTransportDefinition.EVENT_HUB_CONSUMER_GROUP_NAME_PROPERTY_NAME).getValueAsString();
+      provideEventHubConnectionString = ((Boolean) (getProperty(AzureEventHubInboundTransportDefinition.PROVIDE_EVENT_HUB_CONNECTION_STRING_PROPERTY_NAME).getValue()));
+      eventHubConnectionString = getProperty(AzureEventHubInboundTransportDefinition.EVENT_HUB_CONNECTION_STRING_PROPERTY_NAME).getValueAsString();
       eventHubEndpoint = getProperty(AzureEventHubInboundTransportDefinition.EVENT_HUB_ENDPOINT_PROPERTY_NAME).getValueAsString();
       eventHubAccessPolicy = getProperty(AzureEventHubInboundTransportDefinition.EVENT_HUB_ACCESS_POLICY_PROPERTY_NAME).getValueAsString();
       eventHubAccessKey = getProperty(AzureEventHubInboundTransportDefinition.EVENT_HUB_ACCESS_KEY_PROPERTY_NAME).getValueAsString();
@@ -142,19 +147,11 @@ public class AzureEventHubInboundTransport extends InboundTransportBase {
       errorMessage = null;
       readProperties();
 
-      URI eventHubEndpointUri = new URI(eventHubEndpoint);
-      ConnectionStringBuilder builder = new ConnectionStringBuilder(eventHubEndpointUri, eventHubName, eventHubAccessPolicy, eventHubAccessKey);
-      String eventHubConnectionString = builder.toString();
-
-      // create a connection string builder based on the event hub namespace
-      // "iothub-ns-hkiot1-144429-38bfd49a46" (from
-      // "sb://iothub-ns-hkiot1-144429-38bfd49a46.servicebus.windows.net/")
-      // String namespaceName = eventHubEndpointUri.getHost();
-      // namespaceName = namespaceName.substring(0,
-      // namespaceName.lastIndexOf(".servicebus.windows.net"));
-      // ConnectionStringBuilder builder = new
-      // ConnectionStringBuilder(namespaceName, eventHubName, sasKeyName,
-      // sasKey);
+      if (!provideEventHubConnectionString) {
+        URI eventHubEndpointUri = new URI(eventHubEndpoint);
+        ConnectionStringBuilder builder = new ConnectionStringBuilder(eventHubEndpointUri, eventHubName, eventHubAccessPolicy, eventHubAccessKey);
+        eventHubConnectionString = builder.toString();
+      }
 
       host = new EventProcessorHost(eventHubName, eventHubConsumerGroupName, eventHubConnectionString, storageConnectionString);
       EventProcessorOptions options = EventProcessorOptions.getDefaultOptions();
@@ -177,6 +174,15 @@ public class AzureEventHubInboundTransport extends InboundTransportBase {
       this.errorMessage = LOGGER.translate("CREATE_EVENT_HUB_RECEIVER_ERROR", errorMsg);
       setRunningState(RunningState.ERROR);
     }
+  }
+
+  private String buildConnectionStringFromNamespace(URI eventHubEndpointUri) {
+    // build the eventHubNamespaceName
+    String eventHubNamespaceName = eventHubEndpointUri.getHost();
+    eventHubNamespaceName = eventHubNamespaceName.substring(0, eventHubNamespaceName.lastIndexOf(".servicebus.windows.net"));
+
+    ConnectionStringBuilder builder = new ConnectionStringBuilder(eventHubNamespaceName, eventHubName, eventHubAccessPolicy, eventHubAccessKey);
+    return builder.toString();
   }
 
   private void receive(byte[] bytes) {

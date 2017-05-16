@@ -52,6 +52,8 @@
                 <shown>
                     <property label="Event Hub Name" name="eventHubName" source="transport"/>
                     <property default="$Default" label="Consumer Group Name" name="consumerGroupName" source="transport"/>
+                    <property label="Provide Event Hub Connection String" name="provideEventHubConnectionString" source="transport"/>
+                    <property label="Event Hub Connection String" name="eventHubConnectionString" source="transport"/>
                     <property label="Event Hub Endpoint" name="eventHubEndpoint" source="transport"/>
                     <property default="service" label="Event Hub Access Policy" name="eventHubAccessPolicy" source="transport"/>
                     <property label="Event Hub Access Key" name="eventHubAccessKey" source="transport"/>
