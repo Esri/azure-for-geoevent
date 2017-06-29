@@ -32,9 +32,6 @@ import com.esri.ges.framework.i18n.BundleLoggerFactory;
 import com.esri.ges.transport.GeoEventAwareTransport;
 import com.esri.ges.transport.OutboundTransportBase;
 import com.esri.ges.transport.TransportDefinition;
-import com.esri.ges.util.Validator;
-
-
 import com.microsoft.azure.sdk.iot.device.DeviceClient;
 import com.microsoft.azure.sdk.iot.device.IotHubClientProtocol;
 import com.microsoft.azure.sdk.iot.device.IotHubEventCallback;
@@ -46,21 +43,13 @@ import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
-//import com.microsoft.azure.sdk.iot.service.exceptions.IotHubException;
-//import com.microsoft.azure.sdk.iot.service.AuthenticationMechanism;
-//import com.microsoft.azure.sdk.iot.service.Device;
-//import com.microsoft.azure.sdk.iot.service.RegistryManager;
 
 public class AzureAsDeviceOutboundTransport extends OutboundTransportBase implements GeoEventAwareTransport, IotHubEventCallback {
   // logger
   private static final BundleLogger LOGGER = BundleLoggerFactory.getLogger(AzureAsDeviceOutboundTransport.class);
 
-  private static String deviceIdConnectionStringFormat = "HostName=%s.azure-devices.net;DeviceId=%s;SharedAccessKey=%s";
-
   // connection properties
   private String connectionString = "";
-  private String deviceIdGedName = "";
-  private String deviceIdFieldName = "";
 
   private volatile boolean propertiesNeedUpdating = false;
 
@@ -102,22 +91,6 @@ public class AzureAsDeviceOutboundTransport extends OutboundTransportBase implem
           somethingChanged = true;
         }
       }
-      // Device Id GED Name
-      if (hasProperty(AzureAsDeviceOutboundTransportDefinition.DEVICE_ID_GED_NAME_PROPERTY_NAME)) {
-        String newGEDName = getProperty(AzureAsDeviceOutboundTransportDefinition.DEVICE_ID_GED_NAME_PROPERTY_NAME).getValueAsString();
-        if (!deviceIdGedName.equals(newGEDName)) {
-          deviceIdGedName = newGEDName;
-          somethingChanged = true;
-        }
-      }
-      // Device Id Field Name
-      if (hasProperty(AzureAsDeviceOutboundTransportDefinition.DEVICE_ID_FIELD_NAME_PROPERTY_NAME)) {
-        String newDeviceIdFieldName = getProperty(AzureAsDeviceOutboundTransportDefinition.DEVICE_ID_FIELD_NAME_PROPERTY_NAME).getValueAsString();
-        if (!deviceIdFieldName.equals(newDeviceIdFieldName)) {
-          deviceIdFieldName = newDeviceIdFieldName;
-          somethingChanged = true;
-        }
-      }
       propertiesNeedUpdating = somethingChanged;
     } catch (Exception ex) {
       LOGGER.error("INIT_ERROR", ex.getMessage());
@@ -143,35 +116,34 @@ public class AzureAsDeviceOutboundTransport extends OutboundTransportBase implem
 
       setErrorMessage(errorMessage);
       setRunningState(runningState);
-    } catch (Exception ex) {
-      LOGGER.error("INIT_ERROR", ex.getMessage());
-      LOGGER.info(ex.getMessage(), ex);
-      setErrorMessage(ex.getMessage());
+    } catch (Exception error) {
+      LOGGER.error("INIT_ERROR", error.getMessage());
+      LOGGER.info(error.getMessage(), error);
+      setErrorMessage(error.getMessage());
       setRunningState(RunningState.ERROR);
     }
   }
 
   private void createDeviceClient(IotHubClientProtocol protocol) throws IOException, URISyntaxException {
-    if (deviceClient != null)
-      return;
-
-    //int index = 1;
-    //String eventHubName;
-    //String connectionString = String.format(deviceIdConnectionStringFormat, eventHubName, devices[index].getDeviceId(), devices[index].getPrimaryKey());
-
+    closeDeviceClient();
     deviceClient = new DeviceClient(connectionString, protocol);
     deviceClient.open();
   }
 
-  protected void cleanup() {
+  private void closeDeviceClient() {
     // clean up the service client
     if (deviceClient != null) {
       try {
         deviceClient.close();
       } catch (Exception error) {
-        ;
+        // ignored
       }
+      deviceClient = null;
     }
+  }
+
+  protected void cleanup() {
+    closeDeviceClient();
   }
 
   @Override
@@ -187,20 +159,11 @@ public class AzureAsDeviceOutboundTransport extends OutboundTransportBase implem
 
       try {
         // Send Event as a Device
-        Object deviceIdObj = geoEvent.getField(deviceIdFieldName);
-        String deviceId = "";
-        if (deviceIdObj != null)
-          deviceId = deviceIdObj.toString();
-
-        if (Validator.isNotBlank(deviceId)) {
-          String messageStr = new String(buffer.array(), StandardCharsets.UTF_8);
-          Message message = new Message(messageStr);
-          deviceClient.sendEventAsync(message, this, 1);
-        } else {
-          LOGGER.warn("FAILED_TO_SEND_INVALID_DEVICE_ID", deviceIdFieldName);
-        }
+        String messageStr = new String(buffer.array(), StandardCharsets.UTF_8);
+        Message message = new Message(messageStr);
+        deviceClient.sendEventAsync(message, this, 1);
       } catch (Exception e) {
-        // streamClient.stop();
+        //LOGGER.warn("FAILED_TO_SEND_INVALID_DEVICE_ID", deviceIdFieldName);
         setErrorMessage(e.getMessage());
         LOGGER.error(e.getMessage(), e);
         setRunningState(RunningState.ERROR);

@@ -22,7 +22,7 @@
       <version>${iot.service.client.version}</version>
     </dependency>
 
-    <!-- Azure Java IoT Device Client SDK - used to Send Events from a device to an IoT Hub -->
+    <!-- Azure Java IoT Device Client SDK - used to Send Events as (from) a device to an IoT Hub -->
     <dependency>
       <groupId>com.microsoft.azure.sdk.iot</groupId>
       <artifactId>iot-device-client</artifactId>

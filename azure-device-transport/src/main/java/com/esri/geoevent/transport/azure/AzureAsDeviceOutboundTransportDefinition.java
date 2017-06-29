@@ -37,15 +37,11 @@ public class AzureAsDeviceOutboundTransportDefinition extends TransportDefinitio
 
   // property names
   public static final String CONNECTION_STRING_PROPERTY_NAME = "connectionString";
-  public static final String DEVICE_ID_GED_NAME_PROPERTY_NAME = "deviceIdGedName";
-  public static final String DEVICE_ID_FIELD_NAME_PROPERTY_NAME = "deviceIdFieldName";
 
   public AzureAsDeviceOutboundTransportDefinition() {
     super(TransportType.OUTBOUND);
     try {
       propertyDefinitions.put(CONNECTION_STRING_PROPERTY_NAME, new PropertyDefinition(CONNECTION_STRING_PROPERTY_NAME, PropertyType.String, null, "${com.esri.geoevent.transport.azure-device-transport.AS_DEVICE_CONNECTION_STR_LBL}", "${com.esri.geoevent.transport.azure-device-transport.AS_DEVICE_CONNECTION_STR_DESC}", true, false));
-      propertyDefinitions.put(DEVICE_ID_GED_NAME_PROPERTY_NAME, new PropertyDefinition(DEVICE_ID_GED_NAME_PROPERTY_NAME, PropertyType.GeoEventDefinition, null, "${com.esri.geoevent.transport.azure-device-transport.AS_DEVICE_DEVICE_ID_GED_NAME_LBL}", "${com.esri.geoevent.transport.azure-device-transport.AS_DEVICE_DEVICE_ID_GED_NAME_DESC}", "iotServiceType=IoT Device", true, false));
-      propertyDefinitions.put(DEVICE_ID_FIELD_NAME_PROPERTY_NAME, new PropertyDefinition(DEVICE_ID_FIELD_NAME_PROPERTY_NAME, PropertyType.GeoEventDefinitionField, null, "${com.esri.geoevent.transport.azure-device-transport.AS_DEVICE_DEVICE_ID_FIELD_NAME_LBL}", "${com.esri.geoevent.transport.azure-device-transport.AS_DEVICE_DEVICE_ID_FIELD_NAME_DESC}", "iotServiceType=IoT Device", true, false));
     } catch (PropertyException error) {
       LOGGER.error("ERROR_LOADING_TRANSPORT_DEFINITION", error);
       throw new RuntimeException(error);
