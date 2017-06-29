@@ -25,6 +25,8 @@
       <artifactId>scala-library</artifactId>
       <version>${scala.version}</version>
     </dependency>
+
+    <!-- Azure IoT Hub React SDK - using IoTHub to Receive (and Send) events from IoT Hubs -->
     <dependency>
       <groupId>com.microsoft.azure.iot</groupId>
       <artifactId>iothub-react_2.12</artifactId>

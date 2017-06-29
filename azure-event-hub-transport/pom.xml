@@ -15,23 +15,18 @@
   <packaging>bundle</packaging>
 
   <dependencies>
-    <!-- Azure Java Event Hub SDK - using EventHubClient to Receive events from Event Hubs -->
+    <!-- Azure Java Event Hub EPH SDK - using EventProcessorHost to Receive events from Event (and IoT) Hubs -->
     <dependency>
       <groupId>com.microsoft.azure</groupId>
       <artifactId>azure-eventhubs-eph</artifactId>
       <version>${azure.eventhubs.version}</version>
     </dependency>
+
+    <!-- Azure Java Event Hub SDK - using EventHubClient to Send (Notification) Events to Event Hubs  -->
     <dependency>
       <groupId>com.microsoft.azure</groupId>
       <artifactId>azure-eventhubs</artifactId>
       <version>${azure.eventhubs.version}</version>
-    </dependency>
-
-    <!-- Azure Java IoT Device Client SDK - used to Send (Notification) Events to Event Hubs -->
-    <dependency>
-      <groupId>com.microsoft.azure.sdk.iot</groupId>
-      <artifactId>iot-device-client</artifactId>
-      <version>${iot.device.client.version}</version>
     </dependency>
   </dependencies>
 
