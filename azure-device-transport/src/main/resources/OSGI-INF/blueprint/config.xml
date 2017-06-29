@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-  <bean id="AzureDeviceOutboundTransportServiceBean" class="com.esri.geoevent.transport.azure.AzureDeviceOutboundTransportService" activation="eager">
+  <bean id="AzureToDeviceOutboundTransportServiceBean" class="com.esri.geoevent.transport.azure.AzureToDeviceOutboundTransportService" activation="eager">
     <property name="bundleContext" ref="blueprintBundleContext" />
   </bean>
-  <service id="AzureDeviceOutboundTransportService" ref="AzureDeviceOutboundTransportServiceBean" interface="com.esri.ges.transport.TransportService" />
+  <service id="AzureToDeviceOutboundTransportService" ref="AzureToDeviceOutboundTransportServiceBean" interface="com.esri.ges.transport.TransportService" />
+
+  <bean id="AzureAsDeviceOutboundTransportServiceBean" class="com.esri.geoevent.transport.azure.AzureAsDeviceOutboundTransportService" activation="eager">
+    <property name="bundleContext" ref="blueprintBundleContext" />
+  </bean>
+  <service id="AzureAsDeviceOutboundTransportService" ref="AzureAsDeviceOutboundTransportServiceBean" interface="com.esri.ges.transport.TransportService" />
 
 </blueprint>
