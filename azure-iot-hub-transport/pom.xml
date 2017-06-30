@@ -29,8 +29,8 @@
     <!-- Azure IoT Hub React SDK - using IoTHub to Receive (and Send) events from IoT Hubs -->
     <dependency>
       <groupId>com.microsoft.azure.iot</groupId>
-      <artifactId>iothub-react_2.12</artifactId>
-      <version>0.9.0</version>
+      <artifactId>iothub-react_${scala.dep.version}</artifactId>
+      <version>${azure.iothub.react.version}</version>
       <exclusions>
         <exclusion>
           <groupId>org.apache.qpid</groupId>
@@ -41,12 +41,12 @@
     <dependency>
       <groupId>org.apache.qpid</groupId>
       <artifactId>proton-j</artifactId>
-      <version>0.15.0</version>
+      <version>${proton.j.version}</version>
     </dependency>
     <dependency>
       <groupId>com.typesafe.akka</groupId>
-      <artifactId>akka-stream_2.12</artifactId>
-      <version>2.4.18</version>
+      <artifactId>akka-stream_${scala.dep.version}</artifactId>
+      <version>2.4.17</version>
     </dependency>
   </dependencies>
 
