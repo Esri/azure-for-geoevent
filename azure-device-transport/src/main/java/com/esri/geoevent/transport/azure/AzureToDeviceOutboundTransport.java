@@ -38,6 +38,7 @@ import com.microsoft.azure.sdk.iot.service.IotHubServiceClientProtocol;
 import com.microsoft.azure.sdk.iot.service.Message;
 import com.microsoft.azure.sdk.iot.service.ServiceClient;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
@@ -47,6 +48,7 @@ public class AzureToDeviceOutboundTransport extends OutboundTransportBase implem
 
   // connection properties
   private String connectionString = "";
+  private IotHubServiceClientProtocol connectionProtocol = IotHubServiceClientProtocol.valueOf(AzureAsDeviceOutboundTransportDefinition.DEFAULT_CONNECTION_PROTOCOL);
   private String deviceIdGedName = "";
   private String deviceIdFieldName = "";
 
@@ -82,6 +84,15 @@ public class AzureToDeviceOutboundTransport extends OutboundTransportBase implem
         String newConnectionString = getProperty(AzureToDeviceOutboundTransportDefinition.CONNECTION_STRING_PROPERTY_NAME).getValueAsString();
         if (!connectionString.equals(newConnectionString)) {
           connectionString = newConnectionString;
+          somethingChanged = true;
+        }
+      }
+      // Connection Protocol
+      if (hasProperty(AzureToDeviceOutboundTransportDefinition.CONNECTION_PROTOCOL_PROPERTY_NAME)) {
+        String newConnectionProtocolStr = getProperty(AzureToDeviceOutboundTransportDefinition.CONNECTION_PROTOCOL_PROPERTY_NAME).getValueAsString();
+        IotHubServiceClientProtocol newConnectionProtocol = IotHubServiceClientProtocol.valueOf(newConnectionProtocolStr);
+        if (!connectionProtocol.equals(newConnectionProtocol)) {
+          connectionProtocol = newConnectionProtocol;
           somethingChanged = true;
         }
       }
@@ -121,17 +132,7 @@ public class AzureToDeviceOutboundTransport extends OutboundTransportBase implem
         propertiesNeedUpdating = false;
       }
 
-      // setup Azure IoT Device
-      serviceClient = ServiceClient.createFromConnectionString(connectionString, IotHubServiceClientProtocol.AMQPS);
-      serviceClient.open();
-
-      // feedbackReceiver = serviceClient.getFeedbackReceiver(deviceId);
-      // if (feedbackReceiver == null)
-      // {
-      // // TODO: error messages
-      // throw new RuntimeException("ERROR");
-      // }
-      // feedbackReceiver.open();
+      createServiceClient();
 
       setErrorMessage(errorMessage);
       setRunningState(runningState);
@@ -143,24 +144,42 @@ public class AzureToDeviceOutboundTransport extends OutboundTransportBase implem
     }
   }
 
-  protected void cleanup() {
+  private void createServiceClient() throws IOException {
+    closeServiceClient();
+    serviceClient = ServiceClient.createFromConnectionString(connectionString, connectionProtocol);
+    serviceClient.open();
+
+    // feedbackReceiver = serviceClient.getFeedbackReceiver(deviceId);
+    // if (feedbackReceiver == null)
+    // {
+    // // TODO: error messages
+    // throw new RuntimeException("ERROR");
+    // }
+    // feedbackReceiver.open();
+  }
+
+  private void closeServiceClient() {
     // clean up the service client
     if (serviceClient != null) {
       try {
         serviceClient.close();
       } catch (Exception error) {
-        ;
+        // ignored
       }
     }
 
-    // clean up the receiver
+    // clean up the feedback receiver
     if (feedbackReceiver != null) {
       try {
         feedbackReceiver.close();
       } catch (Exception error) {
-        ;
+        // ignored
       }
     }
+  }
+
+  protected void cleanup() {
+    closeServiceClient();
   }
 
   @Override

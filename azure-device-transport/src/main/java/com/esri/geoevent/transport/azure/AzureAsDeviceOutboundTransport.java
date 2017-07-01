@@ -50,6 +50,7 @@ public class AzureAsDeviceOutboundTransport extends OutboundTransportBase implem
 
   // connection properties
   private String connectionString = "";
+  private IotHubClientProtocol connectionProtocol = IotHubClientProtocol.valueOf(AzureAsDeviceOutboundTransportDefinition.DEFAULT_CONNECTION_PROTOCOL);
 
   private volatile boolean propertiesNeedUpdating = false;
 
@@ -76,7 +77,8 @@ public class AzureAsDeviceOutboundTransport extends OutboundTransportBase implem
   @Override
   public void execute(IotHubStatusCode responseStatus, Object callbackContext)
   {
-    //TODO ...
+    // IotHubEventCallback - message sent callback with a feedback response status from the IotHub
+    // TODO ...
   }
 
   public void readProperties() {
@@ -88,6 +90,15 @@ public class AzureAsDeviceOutboundTransport extends OutboundTransportBase implem
         String newConnectionString = getProperty(AzureAsDeviceOutboundTransportDefinition.CONNECTION_STRING_PROPERTY_NAME).getValueAsString();
         if (!connectionString.equals(newConnectionString)) {
           connectionString = newConnectionString;
+          somethingChanged = true;
+        }
+      }
+      // Connection Protocol
+      if (hasProperty(AzureAsDeviceOutboundTransportDefinition.CONNECTION_PROTOCOL_PROPERTY_NAME)) {
+        String newConnectionProtocolStr = getProperty(AzureAsDeviceOutboundTransportDefinition.CONNECTION_PROTOCOL_PROPERTY_NAME).getValueAsString();
+        IotHubClientProtocol newConnectionProtocol = IotHubClientProtocol.valueOf(newConnectionProtocolStr);
+        if (!connectionProtocol.equals(newConnectionProtocol)) {
+          connectionProtocol = newConnectionProtocol;
           somethingChanged = true;
         }
       }
@@ -111,8 +122,7 @@ public class AzureAsDeviceOutboundTransport extends OutboundTransportBase implem
         propertiesNeedUpdating = false;
       }
 
-      // setup Azure IoT Device
-      createDeviceClient(IotHubClientProtocol.AMQPS);
+      createDeviceClient();
 
       setErrorMessage(errorMessage);
       setRunningState(runningState);
@@ -124,9 +134,9 @@ public class AzureAsDeviceOutboundTransport extends OutboundTransportBase implem
     }
   }
 
-  private void createDeviceClient(IotHubClientProtocol protocol) throws IOException, URISyntaxException {
+  private void createDeviceClient() throws IOException, URISyntaxException {
     closeDeviceClient();
-    deviceClient = new DeviceClient(connectionString, protocol);
+    deviceClient = new DeviceClient(connectionString, connectionProtocol);
     deviceClient.open();
   }
 
