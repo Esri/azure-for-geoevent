@@ -63,7 +63,7 @@ public class AzureAsDeviceOutboundTransportDefinition extends TransportDefinitio
       protocolAllowedValues.add(new LabeledValue(CONNECTION_PROTOCOL_LBL_4, CONNECTION_PROTOCOL_VAL_4));
 
       propertyDefinitions.put(CONNECTION_STRING_PROPERTY_NAME, new PropertyDefinition(CONNECTION_STRING_PROPERTY_NAME, PropertyType.String, null, "${com.esri.geoevent.transport.azure-device-transport.AS_DEVICE_CONNECTION_STR_LBL}", "${com.esri.geoevent.transport.azure-device-transport.AS_DEVICE_CONNECTION_STR_DESC}", true, false));
-      propertyDefinitions.put(CONNECTION_PROTOCOL_PROPERTY_NAME, new PropertyDefinition(CONNECTION_PROTOCOL_PROPERTY_NAME, PropertyType.String, DEFAULT_CONNECTION_PROTOCOL, "${com.esri.geoevent.transport.azure-device-transport.AS_DEVICE_PROTOCOL_LBL}", "${com.esri.geoevent.transport.azure-device-transport.AS_DEVICE_PROTOCOL_DESC}", true, false, protocolAllowedValues));
+      propertyDefinitions.put(CONNECTION_PROTOCOL_PROPERTY_NAME, new PropertyDefinition(CONNECTION_PROTOCOL_PROPERTY_NAME, PropertyType.String, DEFAULT_CONNECTION_PROTOCOL, "${com.esri.geoevent.transport.azure-device-transport.AS_DEVICE_PROTOCOL_STR_LBL}", "${com.esri.geoevent.transport.azure-device-transport.AS_DEVICE_PROTOCOL_STR_DESC}", true, false, protocolAllowedValues));
     } catch (PropertyException error) {
       LOGGER.error("ERROR_LOADING_TRANSPORT_DEFINITION", error);
       throw new RuntimeException(error);
