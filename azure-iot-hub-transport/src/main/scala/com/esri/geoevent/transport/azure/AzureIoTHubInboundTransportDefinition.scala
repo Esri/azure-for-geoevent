@@ -36,8 +36,8 @@ class AzureIoTHubInboundTransportDefinition extends TransportDefinitionBase(Tran
 
   try {
     propertyDefinitions.put(AzureIoTHubInboundTransportDefinition.HUB_NAME, new PropertyDefinition(AzureIoTHubInboundTransportDefinition.HUB_NAME, PropertyType.String, null, "${com.esri.geoevent.transport.azure-iot-hub-transport.HUB_NAME_LBL}", "${com.esri.geoevent.transport.azure-iot-hub-transport.HUB_NAME_DESC}", true, false))
-    propertyDefinitions.put(AzureIoTHubInboundTransportDefinition.HUB_ENDPOINT, new PropertyDefinition(AzureIoTHubInboundTransportDefinition.HUB_ENDPOINT, PropertyType.String, EventHubClient.DEFAULT_CONSUMER_GROUP_NAME, "${com.esri.geoevent.transport.azure-iot-hub-transport.CONSUMER_GROUP_NAME_LBL}", "${com.esri.geoevent.transport.azure-iot-hub-transport.CONSUMER_GROUP_NAME_DESC}", true, false))
-    propertyDefinitions.put(AzureIoTHubInboundTransportDefinition.HUB_PARTITIONS, new PropertyDefinition(AzureIoTHubInboundTransportDefinition.HUB_PARTITIONS, PropertyType.Integer, null, "${com.esri.geoevent.transport.azure-iot-hub-transport.HUB_PARTITIONS_LBL}", "${com.esri.geoevent.transport.azure-iot-hub-transport.HUB_PARTITIONS _DESC}", true, false))
+    propertyDefinitions.put(AzureIoTHubInboundTransportDefinition.HUB_ENDPOINT, new PropertyDefinition(AzureIoTHubInboundTransportDefinition.HUB_ENDPOINT, PropertyType.String, null, "${com.esri.geoevent.transport.azure-iot-hub-transport.HUB_ENDPOINT_LBL}", "${com.esri.geoevent.transport.azure-iot-hub-transport.HUB_ENDPOINT_DESC}", true, false))
+    propertyDefinitions.put(AzureIoTHubInboundTransportDefinition.HUB_PARTITIONS, new PropertyDefinition(AzureIoTHubInboundTransportDefinition.HUB_PARTITIONS, PropertyType.Integer, null, "${com.esri.geoevent.transport.azure-iot-hub-transport.HUB_PARTITIONS_LBL}", "${com.esri.geoevent.transport.azure-iot-hub-transport.HUB_PARTITIONS_DESC}", true, false))
     propertyDefinitions.put(AzureIoTHubInboundTransportDefinition.ACCESS_POLICY, new PropertyDefinition(AzureIoTHubInboundTransportDefinition.ACCESS_POLICY, PropertyType.String, null, "${com.esri.geoevent.transport.azure-iot-hub-transport.ACCESS_POLICY_LBL}", "${com.esri.geoevent.transport.azure-iot-hub-transport.ACCESS_POLICY_DESC}", true, false))
     propertyDefinitions.put(AzureIoTHubInboundTransportDefinition.ACCESS_KEY, new PropertyDefinition(AzureIoTHubInboundTransportDefinition.ACCESS_KEY, PropertyType.String, null, "${com.esri.geoevent.transport.azure-iot-hub-transport.ACCESS_KEY_LBL}", "${com.esri.geoevent.transport.azure-iot-hub-transport.ACCESS_KEY_DESC}", true, false))
   } catch {
@@ -63,9 +63,4 @@ object AzureIoTHubInboundTransportDefinition {
   val HUB_PARTITIONS = "hubPartitions"
   val ACCESS_POLICY = "accessPolicy"
   val ACCESS_KEY = "accessKey"
-
-  val IOT_HUB_PATH_PROPERTY_NAME: String = "iotHubPath"
-  val CONSUMER_GROUP_NAME_PROPERTY_NAME: String = "consumerGroupName"
-  val IOT_HUB_CONNECTION_STRING_PROPERTY_NAME: String = "iotHubConnectionString"
-  val STORAGE_CONNECTION_STRING_PROPERTY_NAME: String = "storageConnectionString"
 }

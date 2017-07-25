@@ -100,11 +100,11 @@ class AzureIoTHubInboundTransport(definition: TransportDefinition)
 
   def applyProperties() = {
     try {
-      val hubName = getProperty("hubName").getValueAsString
-      val hubEndpoint = getProperty("hubEndpoint").getValueAsString
-      val hubPartitions = getProperty("hubPartitions").getValueAsString
-      val accessPolicy = getProperty("accessPolicy").getValueAsString
-      val accessKey = getProperty("accessKey").getValueAsString
+      val hubName = getProperty(AzureIoTHubInboundTransportDefinition.HUB_NAME).getValueAsString
+      val hubEndpoint = getProperty(AzureIoTHubInboundTransportDefinition.HUB_ENDPOINT).getValueAsString
+      val hubPartitions = getProperty(AzureIoTHubInboundTransportDefinition.HUB_PARTITIONS).getValueAsString
+      val accessPolicy = getProperty(AzureIoTHubInboundTransportDefinition.ACCESS_POLICY).getValueAsString
+      val accessKey = getProperty(AzureIoTHubInboundTransportDefinition.ACCESS_KEY).getValueAsString
 
       System.setProperty("IOTHUB_EVENTHUB_NAME", hubName)
       System.setProperty("IOTHUB_EVENTHUB_ENDPOINT", hubEndpoint)
