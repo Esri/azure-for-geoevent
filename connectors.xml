@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<template productVersion="10.5.0">
+<template productVersion="10.6.0">
     <connectors>
         <connector accessType="editable" label="Send JSON to Azure Event Hub" name="json-azure-event-hub-out" type="outbound">
-            <adapter uri="com.esri.ges.adapter.outbound/Generic-JSON/10.5.0"/>
+            <adapter uri="com.esri.ges.adapter.outbound/Generic-JSON/10.6.0"/>
             <defaultName>json-azure-event-hub-out</defaultName>
             <description>Send JSON to Azure Event Hub</description>
             <properties>
@@ -16,10 +16,10 @@
                     <property label="Connection String" name="connectionString" source="transport"/>
                 </shown>
             </properties>
-            <transport uri="com.esri.geoevent.transport.outbound/azure-event-hub-out/10.5.0"/>
+            <transport uri="com.esri.geoevent.transport.outbound/azure-event-hub-out/10.6.0"/>
         </connector>
         <connector accessType="editable" label="Send JSON to Azure IoT Device" name="json-azure-device-out" type="outbound">
-            <adapter uri="com.esri.ges.adapter.outbound/Generic-JSON/10.5.0"/>
+            <adapter uri="com.esri.ges.adapter.outbound/Generic-JSON/10.6.0"/>
             <defaultName>json-azure-device-out</defaultName>
             <description>Send JSON to Azure IoT Device</description>
             <properties>
@@ -35,10 +35,10 @@
                     <property label="Device Id Field Name" name="deviceIdFieldName" source="transport"/>
                 </shown>
             </properties>
-            <transport uri="com.esri.geoevent.transport.outbound/azure-device-out/10.5.0"/>
+            <transport uri="com.esri.geoevent.transport.outbound/azure-device-out/10.6.0"/>
         </connector>
         <connector accessType="editable" label="Receive JSON from Azure Event Hub" name="azure-event-hub-json-in" type="inbound">
-            <adapter uri="com.esri.ges.adapter.inbound/Generic-JSON/10.5.0"/>
+            <adapter uri="com.esri.ges.adapter.inbound/Generic-JSON/10.6.0"/>
             <defaultName>azure-event-hub-json-in</defaultName>
             <description>Receive JSON from Azure Event Hub</description>
             <properties>
@@ -69,10 +69,10 @@
                     <property label="Well Known Text Geometry Field" name="WKTextGeometryField" source="adapter"/>
                 </shown>
             </properties>
-            <transport uri="com.esri.geoevent.transport.inbound/azure-event-hub-in/10.5.0"/>
+            <transport uri="com.esri.geoevent.transport.inbound/azure-event-hub-in/10.6.0"/>
         </connector>
         <connector accessType="editable" label="Publish text to a TCP Socket (Server)" name="esri-out-text-tcp-server" type="outbound">
-            <adapter uri="com.esri.ges.adapter.outbound/Text/10.5.0"/>
+            <adapter uri="com.esri.ges.adapter.outbound/Text/10.6.0"/>
             <defaultName>tcp-server-text-out</defaultName>
             <description>Sends GeoEvents as text to TCP Server, so they can be displayed in a client application.</description>
             <properties>
@@ -93,7 +93,7 @@
                     <property default="5575" label="Server Port" name="port" source="transport"/>
                 </shown>
             </properties>
-            <transport uri="com.esri.ges.transport.outbound/TCP/10.5.0"/>
+            <transport uri="com.esri.ges.transport.outbound/TCP/10.6.0"/>
         </connector>
     </connectors>
 </template>

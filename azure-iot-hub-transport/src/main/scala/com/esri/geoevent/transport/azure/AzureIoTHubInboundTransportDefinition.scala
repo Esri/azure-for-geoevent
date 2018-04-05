@@ -54,6 +54,8 @@ class AzureIoTHubInboundTransportDefinition extends TransportDefinitionBase(Tran
 
   override def getDescription(): String = "${com.esri.geoevent.transport.azure-iot-hub-transport.TRANSPORT_IN_DESC}"
 
+  override def getVersion(): String = "10.6.0" 
+   
 }
 
 object AzureIoTHubInboundTransportDefinition {

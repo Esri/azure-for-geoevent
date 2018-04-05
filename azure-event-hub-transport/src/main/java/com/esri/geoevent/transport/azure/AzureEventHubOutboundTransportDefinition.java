@@ -67,4 +67,9 @@ public class AzureEventHubOutboundTransportDefinition extends TransportDefinitio
   public String getDescription() {
     return "${com.esri.geoevent.transport.azure-event-hub-transport.TRANSPORT_OUT_DESC}";
   }
+  
+  @Override
+  public String getVersion() {
+    return "10.6.0";
+  }
 }

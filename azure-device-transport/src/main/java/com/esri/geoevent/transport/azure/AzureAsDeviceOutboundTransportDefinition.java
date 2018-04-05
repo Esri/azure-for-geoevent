@@ -89,4 +89,9 @@ public class AzureAsDeviceOutboundTransportDefinition extends TransportDefinitio
   public String getDescription() {
     return "${com.esri.geoevent.transport.azure-device-transport.TRANSPORT_AS_DEVICE_OUT_DESC}";
   }
+  
+  @Override
+  public String getVersion() {
+    return "10.6.0";
+  }
 }

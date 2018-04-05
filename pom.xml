@@ -5,7 +5,7 @@
 
   <groupId>com.esri.geoevent.parent</groupId>
   <artifactId>azure</artifactId>
-  <version>10.5.0</version>
+  <version>10.6.0</version>
   <packaging>pom</packaging>
 
   <name>Esri :: GeoEvent :: Azure</name>
@@ -33,7 +33,7 @@
     <dependency>
       <groupId>com.esri.geoevent.sdk</groupId>
       <artifactId>geoevent-sdk</artifactId>
-      <version>10.5.0</version>
+      <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>
