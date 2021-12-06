@@ -15,15 +15,24 @@
   <packaging>bundle</packaging>
 
   <properties>
-    <scala.version>2.11.8</scala.version>
-    <scala.dep.version>2.11</scala.dep.version>
+    <scala.version>2.12.10</scala.version>
+    <scala.dep.version>2.12</scala.dep.version>
   </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.scala-lang</groupId>
+        <artifactId>scala-library</artifactId>
+        <version>${scala.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <dependencies>
     <dependency>
       <groupId>org.scala-lang</groupId>
       <artifactId>scala-library</artifactId>
-      <version>${scala.version}</version>
     </dependency>
 
     <!-- Azure IoT Hub React SDK - using IoTHub to Receive (and Send) events from IoT Hubs -->
@@ -88,7 +97,7 @@
             <Private-Package>
               com.esri.geoevent.transport.azure
             </Private-Package>
-            <Export-Package />
+            <Export-Package/>
             <Embed-Dependency>
               *;scope=compile|runtime;inline=true
             </Embed-Dependency>
