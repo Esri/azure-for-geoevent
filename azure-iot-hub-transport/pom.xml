@@ -11,11 +11,12 @@
 
   <groupId>com.esri.geoevent.transport</groupId>
   <artifactId>azure-iot-hub-transport</artifactId>
+  <version>10.9.0</version>
   <name>Esri :: GeoEvent :: Transport :: Azure IoT Hub</name>
   <packaging>bundle</packaging>
 
   <properties>
-    <scala.version>2.12.10</scala.version>
+    <scala.version>2.12.11</scala.version>
     <scala.dep.version>2.12</scala.dep.version>
   </properties>
 
