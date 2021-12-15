@@ -88,6 +88,18 @@
         <groupId>net.alchim31.maven</groupId>
         <artifactId>scala-maven-plugin</artifactId>
         <version>${scala.maven.plugin.version}</version>
+        <configuration>
+          <checkMultipleScalaVersions>false</checkMultipleScalaVersions>
+          <recompileMode>incremental</recompileMode>
+          <args>
+            <arg>-target:jvm-1.8</arg>
+          </args>
+          <jvmArgs>
+            <jvmArg>-Xss1024k</jvmArg>
+            <jvmArg>-Xms64m</jvmArg>
+            <jvmArg>-Xmx2048m</jvmArg>
+          </jvmArgs>
+        </configuration>
         <executions>
           <execution>
             <goals>
