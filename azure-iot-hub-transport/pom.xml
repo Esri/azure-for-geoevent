@@ -15,15 +15,38 @@
   <packaging>bundle</packaging>
 
   <properties>
-    <scala.version>2.11.8</scala.version>
+    <scala.maven.plugin.version>4.4.1</scala.maven.plugin.version>
+    <scala.version>2.11.12</scala.version>
     <scala.dep.version>2.11</scala.dep.version>
+    <akka.version>2.4.17</akka.version>
+    <jackson.version>2.10.5</jackson.version>
+    <jackson.databind.version>2.10.5.1</jackson.databind.version>
   </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.scala-lang</groupId>
+        <artifactId>scala-library</artifactId>
+        <version>${scala.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-core</artifactId>
+        <version>${jackson.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.typesafe.akka</groupId>
+        <artifactId>akka-stream_${scala.dep.version}</artifactId>
+        <version>${akka.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <dependencies>
     <dependency>
       <groupId>org.scala-lang</groupId>
       <artifactId>scala-library</artifactId>
-      <version>${scala.version}</version>
     </dependency>
 
     <!-- Azure IoT Hub React SDK - using IoTHub to Receive (and Send) events from IoT Hubs -->
@@ -46,16 +69,36 @@
     <dependency>
       <groupId>com.typesafe.akka</groupId>
       <artifactId>akka-stream_${scala.dep.version}</artifactId>
-      <version>2.4.17</version>
     </dependency>
   </dependencies>
 
   <build>
     <plugins>
       <plugin>
-        <groupId>org.scala-tools</groupId>
-        <artifactId>maven-scala-plugin</artifactId>
-        <version>2.15.2</version>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>${maven.compler.plugin.version}</version>
+        <configuration>
+          <source>${java.version}</source>
+          <target>${java.version}</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>net.alchim31.maven</groupId>
+        <artifactId>scala-maven-plugin</artifactId>
+        <version>${scala.maven.plugin.version}</version>
+        <configuration>
+          <checkMultipleScalaVersions>false</checkMultipleScalaVersions>
+          <recompileMode>incremental</recompileMode>
+          <args>
+            <arg>-target:jvm-1.8</arg>
+          </args>
+          <jvmArgs>
+            <jvmArg>-Xss1024k</jvmArg>
+            <jvmArg>-Xms64m</jvmArg>
+            <jvmArg>-Xmx2048m</jvmArg>
+          </jvmArgs>
+        </configuration>
         <executions>
           <execution>
             <goals>
@@ -70,11 +113,30 @@
           </execution>
         </executions>
       </plugin>
-
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.2.4</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                  <resource>reference.conf</resource>
+                </transformer>
+              </transformers>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
-        <version>3.0.0</version>
+        <version>${maven.bundle.plugin.version}</version>
         <extensions>true</extensions>
         <configuration>
           <instructions>
@@ -88,7 +150,7 @@
             <Private-Package>
               com.esri.geoevent.transport.azure
             </Private-Package>
-            <Export-Package />
+            <Export-Package/>
             <Embed-Dependency>
               *;scope=compile|runtime;inline=true
             </Embed-Dependency>
@@ -96,7 +158,6 @@
           </instructions>
         </configuration>
       </plugin>
-
     </plugins>
   </build>
 </project>
