@@ -1,5 +1,7 @@
 # Microsoft Azure Connectors
 
+**This item has been deprecated. Please refer to the blog article [here](https://community.esri.com/t5/arcgis-geoevent-server-blog/working-with-azure-event-hubs-using-kafka/ba-p/1235366) for an alternative method for Azure Event Hubs integration. Please consider contributing an idea to the [Esri Community](https://community.esri.com/t5/arcgis-geoevent-server-ideas/idb-p/arcgis-geoevent-server-ideas) if you need similar functionality.**
+
 ArcGIS GeoEvent Server sample Azure connectors for connecting to Microsoft Azure Hubs and Devices.
 
 ![App](azure-for-geoevent.png?raw=true)
